@@ -1,8 +1,10 @@
-const mysql = require('mysql');
-const pool  = mysql.createPool({
-  host            : 'localhost',
-  user            : 'denis_tsvetkov',
-  password        : 'batman59',
-  database        : 'hotelcomplex'
-});
-exports.db = pool;
+const pgp = require('pg-promise')();
+const cn = {
+    host: 'localhost',
+    port: 5432,
+    database: 'microblog',
+    user: 'postgres',
+    password: 'batman59' //password here
+};
+
+exports.db = pgp(cn);

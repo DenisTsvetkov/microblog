@@ -1,7 +1,7 @@
 {
-  "name": "expressjs",
+  "name": "microblog",
   "version": "1.0.0",
-  "description": "",
+  "description": "Course Work, Project service of microblog",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,7 +14,6 @@
     "express-handlebars": "^3.0.0",
     "handlebars": "^4.0.12",
     "hbs": "^4.0.1",
-    "mysql": "^2.16.0",
-    "pug": "^2.0.3"
+    "pg-promise": "^8.5.3"
   }
 }
