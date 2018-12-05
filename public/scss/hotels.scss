@@ -1,0 +1,100 @@
+@import "_colors";
+@import "_reset";
+@import "_header";
+@import "_section-title";
+@import "_gradients";
+@import "_popup";
+@import "_stars";
+
+.item{
+    text-decoration: none;
+    display: block;
+    height: 150px;
+    border-radius: 5px;
+    position: relative;
+    margin-bottom:30px;
+    color:#fff;
+    text-align: center;
+    
+    &__name{
+        max-width: 100px;
+        font-weight: 500;
+        color:#fff;
+        line-height: 30px;
+        text-align: center;
+        transform: translate(-50%, -50%);
+        position: relative;
+        left: 50%;
+        top:50%;
+    }
+    transition: box-shadow .2s;
+    &:hover{
+        box-shadow: 1px 1px 20px rgba(0,0,0,.5);
+        cursor: pointer;
+    }
+    &__arrow{
+        border: 20px solid transparent;	border-top: 20px solid #4A63CD;
+        position: absolute;
+        bottom:0;
+        left:50%;
+        transform: translateX(-50%);
+    }
+}
+
+.item.add-house{
+    border: 1px solid $textColor;
+    .item__name{
+        color: $textColor;
+    }
+}
+
+.item-info{
+    margin-bottom: 24px;
+}
+
+.hotel-info{
+    display: none;
+    background-color: #E9E9E9;
+    padding: 40px 0;
+    
+}
+
+.list-types{
+    list-style: none;
+    & > li{
+        padding: 9px 15px;
+        border-radius: 15px;
+        background-color: #b1b1b1;
+        margin-right: 12px;
+        margin-bottom: 12px;
+        color:#fff;
+        display: inline-block;
+        font-size: 12px;
+        &:hover{
+            cursor: pointer;
+        }
+    }
+}
+
+.title-list-types{
+    margin-bottom: 12px;
+}
+
+.btn{
+    font-size: 12px;
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    padding: 12px 0;
+    text-align: center;
+    border-radius: 5px;
+    &._hotel-edit{
+        background-color: #F1B366;
+    }
+    &._hotel-delete{
+        background-color: #E7585D;
+    }
+    &>i.fas{
+        margin-right: 8px;
+    }
+}

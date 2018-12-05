@@ -1,0 +1,47 @@
+.popup{
+    display: none;
+    border-radius: 5px;
+    position: absolute;
+    left: 50%;
+    top: 200px;
+    z-index: 10;
+    transform: translate(-50%,-50%);
+    background-color: #EEEDED;
+    width: 100%;
+    font-size: 14px;
+    padding: 40px 0;
+    box-shadow: 0 0 30px rgba(0,0,0,.5);
+    & form{
+        margin: 0 auto;
+        width: 350px;
+    }
+    & input{
+        width: 100%;
+        padding: 10px 30px;
+        margin-bottom: 20px;
+        
+    }
+    & label{
+        display: inline-block;
+        margin-bottom: 7px;
+    }
+    & input[type='number']{
+        width: 150px;
+        padding: 10px 10px 10px 30px;
+    }
+
+    & input[type='submit']{
+        margin-top: 30px;
+    }
+    &__close{
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        font-size: 18px;
+        color:#A9A5A5;
+        &:hover{
+            color:$textColor;
+            cursor: pointer;
+        }
+    }
+}

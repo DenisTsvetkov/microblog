@@ -1,0 +1,17 @@
+$item-style: (
+    lightBlue: linear-gradient(-34deg, $turquoise, $scooter),
+    pinkOrange: linear-gradient(-34deg, $hotPink, $jaffa),
+    blue: linear-gradient(-34deg, $havelockBlue, $purpleHeart),
+    yellow: linear-gradient(-34deg, $ochre, $fuelYellow),
+    purple: linear-gradient(-34deg, $electricViolet, $purpleHeart),
+    dodgetBlue: linear-gradient(-34deg, $turquoiseBlue, $dodgerBlue),
+    shamrock: linear-gradient(-34deg, $shamrock, $turquoise)
+);
+
+.item-style {
+  @each $status, $gradient in $item-style{
+    &__#{$status} {
+      background: $gradient;
+    }
+  }
+}

@@ -1,0 +1,59 @@
+@import "_colors";
+@import "_reset";
+@import "_header";
+@import "_section-title";
+@import "_gradients";
+@import "_popup";
+
+.table-clients{
+    position: relative;
+    text-align: center;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,.8);
+    &>thead{
+        background-color: rgba(0,0,0,.8);
+        font-size: 12px;
+        color:#fff;
+        & td{
+            margin:0;
+            padding: 5px 20px;
+        }
+    }
+    &>tbody{
+        font-size: 14px;
+        &>tr{
+            background-color: rgba(255,255,255,1);
+            &:nth-child(even){
+                background-color: rgba(255,255,255,.9);
+            }
+            &>td{
+                padding: 5px 15px;
+            }
+        }
+        
+    }
+    &__pages-btn{
+        position: absolute;
+        list-style: none;
+        bottom:-50px;
+        left:15px;
+        display: flex;
+        &>li{
+            align-self: center;
+            line-height: 30px;
+            font-size: 14px;
+            text-align: center;
+            min-width: 30px;
+            min-height: 30px;
+            background-color: #EEEDED;
+            font-weight: 700;
+            margin: 0;
+            color:#5F5F5F;
+        }
+        &>li:first-child, &>li:last-child{
+            background-color: #583DCA;
+            color:#fff;
+            font-weight: 400;
+        }
+    }
+}

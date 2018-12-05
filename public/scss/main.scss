@@ -1,0 +1,33 @@
+@import "_colors";
+@import "_reset";
+@import "_header";
+@import "_section-title";
+@import "_gradients";
+
+
+.item{
+    text-decoration: none;
+    display: block;
+    height: 236px;
+    border-radius: 5px;
+    position: relative;
+    margin-bottom:30px;
+    &__icon{
+        position: absolute;
+        bottom:0;
+        left:0;
+    }
+    &__title{
+        padding: 55px 63px;
+        font-weight: 500;
+        color:#fff;
+        line-height: 30px;
+        
+    }
+    transition: box-shadow .2s;
+    &:hover{
+        box-shadow: 1px 1px 20px rgba(0,0,0,.5);
+        cursor: pointer;
+    }
+}
+

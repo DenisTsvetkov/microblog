@@ -1,0 +1,84 @@
+
+    <main class="main">
+        <div class="container">
+            <h2 class="section-title">Бронирование номера</h2>
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <form action="#" class="chooseHotel">
+                        <input class="hotel-choose__input" type="text" name="hotel" value="Выберите корпус" disabled>
+                        <i class="fas fa-chevron-circle-down"></i>
+                        <ul class="hotels">
+                        
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <section class="section-hotel-floors">
+            <div class="container">
+                <div class="row">
+                        <div class="col-md-4">
+                            <table class="hotel-floors">
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="room">
+                                <div class="room_text room__number">Номер № <b>1</b></div>
+                                <div class="room_text room__type">Тип: <b>Одноместный</b></div>
+                                <div class="room_text room__cost">Стоимость: <b>1200 руб. / сут.</b></div>
+                                <div class="room_text client"><b>Клиент:</b></div>
+                                <div class="client-type">
+                                    <p><input name="client-type" type="radio" value="new"> Новый</p>
+                                    <p><input name="client-type" type="radio" value="exist"> Существующий</p>
+                                </div>
+                                <form class="form-new-client">
+                                    <input type="text" placeholder="Фамилия"><br>
+                                    <input type="text" placeholder="Имя"><br>
+                                    <input type="text" placeholder="Отчество"><br>
+                                    <input type="number" placeholder="Паспорт (серия)">
+                                    <input type="number" placeholder="Паспорт (номер)"><br>
+                                    <input type="phone" placeholder="Номер телефона">
+                                </form>
+                                <form class="form-exist-client">
+                                    <label for="phone_exist_client">Поиск: </label><input type="phone" name="phone_exist_client" placeholder="Номер телефона">
+                                    <button class="search-client item-style__blue">Поиск</button>
+                                    <div class="search-result">
+                                        <p>Результаты поиска:</p>
+                                        <table class="table-search-clients">
+                                            <thead>
+                                                <tr>
+                                                    <td>ФИО</td>
+                                                    <td>Номер телефона</td>
+                                                    <td>Дата регистрации</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </form>
+                                <div class="room_text period"><b>Заселение:</b></div>
+                                <form class="form-period-booking">
+                                    <div class="item-period"><p>Проживание от: </p><input type="date" name="calendar_first"></div>
+                                    <div class="item-period"><p>Проживание до: </p><input type="date" name="calendar_end"></div>
+                                </form>
+                                <div class="room_text cost-result">Сумма в итоге:<b></b></div>
+                                <button class="booking-result item-style__blue"><i class="fas fa-check-circle"></i>Забронировать номер</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    
+
+</body>
+</html>

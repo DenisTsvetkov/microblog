@@ -1,0 +1,147 @@
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-6">
+                        <div class="popup">
+                            <div class="popup__close">
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <form action="server/hotel.php">
+                                <label for="">Название корпуса:</label><br>
+                                <input type="text" placeholder='Название корпуса' required><br>
+                                <label for="">Количество этажей:</label><br>
+                                <input type="number" min="1" max="100" value="1" required><br>
+                                <label for="">Класс отеля:</label><br>
+                                <div class="input-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <input type="hidden" value="0" name="hotel-class">
+
+                                <input type="submit" value="Добавить корпус">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    <main class="main">
+        
+        <div class="container">
+            <h2 class="section-title">Корпуса</h2>
+            <div class="row">
+                {{#each Hotel}}
+                    <div class="col-2">
+                        <a href="" class="item item-style__blue" data-hotel-id="{{this.id}}" data-class="{{this.class}}" data-count-floors="{{this.count_floors}}">
+                            <p class="item__name">{{this.name}}</p>
+                            <div class="item__arrow"></div>
+                        </a>
+                    </div>
+                {{/each}}
+                <div class="col-2">
+                    <a href="" class="item add-hotel">
+                        <p class="item__name">Добавить</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <section class="hotel-info">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="item-info hotel-class">
+                            <p class="title">Класс отеля:</p>
+                            <div class="stars">
+                                <i class="fas fa-star active"></i>
+                                <i class="fas fa-star active"></i>
+                                <i class="fas fa-star active"></i>
+                                <i class="fas fa-star active"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="item-info hotel-count-floors">
+                            <p class="title">Количество этажей: <b>4</b></p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="item-info hotel-count-rooms">
+                            <p class="title">Общее количество комнат: <b>356 (56 / 100 / 100 / 100)</b></p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="item-info types-rooms">
+                            <p class="title title-list-types">Местность номеров:</p>
+                            <ul class="list-types">
+                                <li>Одноместные</li>
+                                <li>Двухместные</li>
+                                <li>Трехместные</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="item-info services">
+                            <p class="title title-list-types">Службы быта в этом корпусе:</p>
+                            <ul class="list-types">
+                                <li>Ежедневная уборка номеров</li>
+                                <li>Ресторан</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="item-info entertainments">
+                            <p class="title title-list-types">Развлечения:</p>
+                            <ul class="list-types">
+                                <li>Бассеин</li>
+                                <li>Сауна</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <a href="" class="btn _hotel-edit"><i class="fas fa-pencil-alt"></i>Редактировать</a>
+                    </div>
+                    <div class="col-2">
+                        <a href="" class="btn _hotel-delete"><i class="fas fa-trash-alt"></i>Удалить</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="js/stars.js"></script>
+    <script src="js/ajax.js"></script>
+    <script>
+        $(document).ready(function(){
+            
+            setClassHotel($('.input-stars'));
+
+            $.fn.serializeAnything = function() {
+                var result = {};
+                $.each(this, function (key, value) {
+                    result = $(this).data();
+                    result.hotelName = $(this).find('.item__name').text();
+                })
+                return result;
+            }
+
+            $('.item:not(.add-hotel)').on('click', function(e){
+                e.preventDefault();
+                var data = $(this).serializeAnything();
+
+                AJAX('/info', 'POST', data, (res)=>{
+                    data.services = res.services;
+                    data.entertainments = res.entertainments;
+                });
+
+                console.log(data);
+            });
+        });
+
+    </script>
+
+</body>
+</html>

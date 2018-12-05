@@ -1,0 +1,10 @@
+.fa-star{
+    color:#B7B7B7;
+    &.active{
+        color:#E6A436;
+    }
+    &:hover{
+        // color:#E6A436;
+        cursor: pointer;
+    }
+}
