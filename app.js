@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const expressHbs = require("express-handlebars");
 var indexRouter = require(__dirname+'/router');
-const db = require(__dirname+'/config/Db').db;
+
 const app = express();
 
 app.engine("hbs", expressHbs(
@@ -14,7 +14,7 @@ app.engine("hbs", expressHbs(
 ))
 app.set("view engine", "hbs");
 
-app.use('/', express.static(__dirname+'/public'));
+app.use('/', express.static(__dirname+'/public/build'));
 
 app.use(bodyParser.json());
 

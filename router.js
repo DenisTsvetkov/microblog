@@ -2,18 +2,20 @@ var express = require('express');
 var router = express.Router();
 
 var users = require('./controllers/UserController');
-var hotels = require('./controllers/HotelController');
+var posts = require('./controllers/PostController');
 
 // router.get('/', (req, res)=>{
 //     res.render("index", {this_css:'main'});
 // });
 
-router.get('/', users.getAll);
+router.get('/', (req, res)=>{
+    res.render("index");
+});
 
-router.get('/booking', users.hotels);
+// router.get('/booking', users.hotels);
 
-router.get('/hotels', hotels.getAll);
+// router.get('/hotels', hotels.getAll);
 
-router.post('/info', hotels.getInfo);
+// router.post('/info', hotels.getInfo);
 
 module.exports = router;
