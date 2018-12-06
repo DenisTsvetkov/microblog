@@ -21,6 +21,10 @@
     "pg-promise": "^8.5.3"
   },
   "devDependencies": {
-    "gulp-nodemon": "^2.4.2"
+    "browser-sync": "^2.26.3",
+    "gulp": "^3.9.1",
+    "gulp-nodemon": "^2.4.2",
+    "gulp-notify": "^3.2.0",
+    "gulp-sass": "^4.0.2"
   }
 }

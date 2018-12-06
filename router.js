@@ -9,7 +9,7 @@ var posts = require('./controllers/PostController');
 // });
 
 router.get('/', (req, res)=>{
-    res.render("index");
+    res.render("index", {this_css:'main'});
 });
 
 // router.get('/booking', users.hotels);

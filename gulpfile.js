@@ -16,10 +16,11 @@ gulp.task('start', function (done) {
 // Static Server + watching scss/html files
 gulp.task('serve', ['sass-watch', 'start']);
 
+
 // Compile sass into CSS & auto-inject into browsers
 gulp.task('sass-watch', function() {
   return gulp.watch(["public/scss/*.scss"], function() {
-    gulp.start('sass');
+    gulp.start('sass')
   })
 });
 
@@ -33,7 +34,6 @@ gulp.task('sass', function() {
             } ) )
         )
         .pipe(gulp.dest("public/css"))
-        // .pipe(browserSync.stream());
 });
 
 gulp.task('default', ['serve']);
