@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Микроблог</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700&amp;subset=cyrillic" rel="stylesheet">
+        <link rel="stylesheet" href="css/bootstrap-reboot.min.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/{{this_css}}.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    </head>
+    <body class="sign-up-page">
+        <header>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <nav class="navbar navbar-light no-header-padding">
+                            <a class="navbar-brand">!twitter</a>
+                            <form class="form-inline">
+                                <input class="form-control mr-sm-2" type="text" placeholder="Логин" aria-label="Login">
+                                <input class="form-control mr-sm-2" type="password" placeholder="Пароль" aria-label="Password">
+                                <button class="btn btn-primary my-8 my-sm-0" type="submit">Войти</button>
+                            </form>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main center">
+            <div class="container">
+                <div class="row d-flex justify-content-between align-items-center">
+                    <div class="col-4">
+                        <div class="service-description">
+                            <h1>Микроблог</h1>
+                            <h3>Добро пожаловать на сервис микроблогинга. Здесь вы можете:</h3>
+                            <ul>
+                                <li>Подписываться на интересных людей и узнавать их новости</li>
+                                <li>Делиться новостями с мировым сообществом</li>
+                                <li>Следить за интересной информацией</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="sign-up">
+                            <form>
+                                <div class="form-group">
+                                    <label for="InputName">Ваше имя</label>
+                                    <input type="text" class="form-control" id="InputName" placeholder="Введите ваше имя">
+                                </div>
+                                <div class="form-group">
+                                    <label for="InputSurname">Ваша фамилия</label>
+                                    <input type="text" class="form-control" id="InputSurname" placeholder="Введите вашую фамилию">
+                                </div>
+                                <div class="form-group">
+                                    <label for="InputUsername">Имя пользователя</label>
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text" style="border-top-right-radius:0; border-bottom-right-radius:0; margin-right:-3px; z-index:2">@</div>
+                                        <input type="text" class="form-control" id="InputUsername" placeholder="Введите имя пользователя">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="InputEmail">Электронная почта</label>
+                                    <input type="email" class="form-control" id="InputEmail" placeholder="Введите электронную почту">
+                                    <small id="emailHelp" class="form-text text-muted">Электронная почта должна быть уникальна</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="InputPassword1">Пароль</label>
+                                    <input type="password" class="form-control" id="InputPassword1" placeholder="Введите пароль">
+                                </div>
+                                <div class="form-group">
+                                    <label for="InputPassword2">Повторите пароль</label>
+                                    <input type="password" class="form-control" id="InputPassword2" placeholder="Введите пароль ещё раз">
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                                </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

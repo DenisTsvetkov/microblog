@@ -13,3 +13,7 @@ exports.getAll = (req, res) => {
         }
     });
 }
+
+exports.profile = (req, res) => {
+    res.render("profile", {this_css:'main'});
+}
