@@ -40,11 +40,23 @@ header{
     &-name{
         display: block;
         font-weight: 700;
-        margin-left: 15px;
     }
     &-username{
         color:$lightGray;
-        margin-left: 15px;
+    }
+    &-avatar{
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    &-avatar-mini{
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-bottom: 10px;
     }
 }
 
@@ -54,6 +66,14 @@ header{
     background-color: $elemBgColor;
     position: relative;
     margin-bottom: 3px;
+    &-avatar{
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 15px;
+        float:left;
+    }
     &-name{
         color:$darkGray;
         font-weight: 700;
@@ -66,7 +86,7 @@ header{
         margin-left:15px;
     }
     &-content{
-        margin: 15px 10px 40px;
+        margin: 7px 10px 40px 63px;
     }
     &-action-list{
         position: absolute;
