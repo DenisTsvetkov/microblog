@@ -36,14 +36,20 @@ header {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    overflow: hidden;
-    margin-bottom: 10px; }
+    background-size: contain;
+    margin-bottom: 10px;
+    overflow: hidden; }
+    .profile-card-avatar > img {
+      height: 100%; }
   .profile-card-avatar-mini {
     width: 100px;
     height: 100px;
     border-radius: 50%;
     overflow: hidden;
-    margin-bottom: 10px; }
+    margin-bottom: 10px;
+    background-size: contain; }
+    .profile-card-avatar-mini > img {
+      height: 100%; }
 
 .post {
   padding: 30px;
@@ -58,6 +64,8 @@ header {
     overflow: hidden;
     margin-right: 15px;
     float: left; }
+    .post-avatar > img {
+      height: 100%; }
   .post-name {
     color: #3C3C3C;
     font-weight: 700; }

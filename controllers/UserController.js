@@ -7,7 +7,6 @@ exports.getAll = (req, res) => {
             return res.sendStatus(500);
         }
         else{
-            //data.this_css = "hotels";
             console.log(data);
             res.render("index", {Hotel: data, this_css:"hotels"});
         }
@@ -15,5 +14,29 @@ exports.getAll = (req, res) => {
 }
 
 exports.profile = (req, res) => {
-    res.render("profile", {this_css:'main'});
+    db.func('get_user_profile', req.params.username)
+        .then(data => {
+            console.log(data);
+            if(data[0] != undefined){
+                res.render("profile", {'data':data[0], 'this_css':"main"});
+            }
+            else{
+                res.send('404', 'Пользователь не найден')
+            }
+        })
+        .catch(error => {
+            console.log('Get user info: ' + req.params.username + ':\n' + error);
+ 		    res.send('501')
+        })
+}
+
+exports.stats = (req, res) => {
+    db.func('get_user_profile', req.params.username)
+        .then(data => {
+            
+        })
+        .catch(error => {
+            console.log('Get user info: ' + req.params.username + ':\n' + error);
+ 		    res.send('501')
+        })
 }

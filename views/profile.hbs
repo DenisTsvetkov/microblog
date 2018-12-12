@@ -5,9 +5,11 @@
                 <div class="dashboard">
                     <div class="profile-card">
                         <div class="profile-card-info d-flex justify-content-center flex-column align-items-center">
-                            <img src="img/users/_Cvetkoff.jpg" alt="Rick Grimes" class="profile-card-avatar">
-                            <span class="profile-card-name">Rick Grimes</span>
-                            <a href="#" class="profile-card-username">@rick_grimes</a>
+                            <div class="profile-card-avatar">
+                                <img src="img/users/_Cvetkoff.jpg" alt="Rick Grimes">
+                            </div>
+                            <span class="profile-card-name">{{data.name}} {{data.surname}}</span>
+                            <a href="#" class="profile-card-username">@{{data.username}}</a>
                         </div>
                         <ul class="profile-stats list-group">
                             <li class="list-group-item d-flex justify-content-between align-items-center borderless">
@@ -35,8 +37,8 @@
             <div class="col-12 col-lg-9">
                 <div class="news">
                     <div class="post">
-                        <span class="post-name">Rick Grimes</span>
-                        <span class="post-username">@rick_grimes</span>
+                        <span class="post-name">{{data.name}} {{data.surname}}</span>
+                        <span class="post-username">@{{data.username}}</span>
                         <span class="post-created-date">22:35 11.12.2018</span>
                         <p class="post-content">
                             Короче это мой первый твит епта

@@ -48,8 +48,14 @@ header{
         width: 150px;
         height: 150px;
         border-radius: 50%;
-        overflow: hidden;
+        background-size: contain;
+        
         margin-bottom: 10px;
+        overflow: hidden;
+        &>img{
+            height: 100%;
+            
+        }
     }
     &-avatar-mini{
         width: 100px;
@@ -57,6 +63,12 @@ header{
         border-radius: 50%;
         overflow: hidden;
         margin-bottom: 10px;
+        background-size: contain;
+        
+        &>img{
+            height: 100%;
+            
+        }
     }
 }
 
@@ -73,6 +85,9 @@ header{
         overflow: hidden;
         margin-right: 15px;
         float:left;
+        &>img{
+            height: 100%;
+        }
     }
     &-name{
         color:$darkGray;
