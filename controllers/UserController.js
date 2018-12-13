@@ -13,12 +13,28 @@ exports.getAll = (req, res) => {
     });
 }
 
+exports.stats = (req, res) => {
+    db.func('get_user_stats', req.params.username)
+        .then(data => {
+            return data;
+        })
+        .catch(error => {
+
+        })
+}
+
 exports.profile = (req, res) => {
     db.func('get_user_profile', req.params.username)
         .then(data => {
-            console.log(data);
+            let userProfile = {};
             if(data[0] != undefined){
-                res.render("profile", {'data':data[0], 'this_css':"main"});
+                userProfile.data = data[0];
+                db.func('get_user_stats', req.params.username)
+                    .then(stats => {
+                        userProfile.stats = stats[0];
+                        userProfile.this_css="main";
+                        res.render("profile", userProfile);
+                })
             }
             else{
                 res.send('404', 'Пользователь не найден')
@@ -30,13 +46,3 @@ exports.profile = (req, res) => {
         })
 }
 
-exports.stats = (req, res) => {
-    db.func('get_user_profile', req.params.username)
-        .then(data => {
-            
-        })
-        .catch(error => {
-            console.log('Get user info: ' + req.params.username + ':\n' + error);
- 		    res.send('501')
-        })
-}
