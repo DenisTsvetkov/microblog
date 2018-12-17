@@ -8,7 +8,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700&amp;subset=cyrillic" rel="stylesheet">
         <link rel="stylesheet" href="css/bootstrap-reboot.min.css">
         <link rel="stylesheet" href="css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/{{this_css}}.css">
+        <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     </head>
     <body class="sign-up-page">
@@ -18,9 +18,9 @@
                     <div class="col-12">
                         <nav class="navbar navbar-light no-header-padding">
                             <a class="navbar-brand">!twitter</a>
-                            <form class="form-inline">
-                                <input class="form-control mr-sm-2" type="text" placeholder="Логин" aria-label="Login">
-                                <input class="form-control mr-sm-2" type="password" placeholder="Пароль" aria-label="Password">
+                            <form class="form-inline" action="/signin" method="POST">
+                                <input class="form-control mr-sm-2" type="text" name="login" placeholder="Логин" aria-label="Login">
+                                <input class="form-control mr-sm-2" type="password" name="password" placeholder="Пароль" aria-label="Password">
                                 <button class="btn btn-primary my-8 my-sm-0" type="submit">Войти</button>
                             </form>
                         </nav>

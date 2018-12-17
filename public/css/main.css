@@ -51,6 +51,16 @@ header {
     .profile-card-avatar-mini > img {
       height: 100%; }
 
+.profile-stats > .list-group-item {
+  color: #3C3C3C; }
+  .profile-stats > .list-group-item > a {
+    color: #3C3C3C; }
+    .profile-stats > .list-group-item > a:hover {
+      text-decoration: none; }
+  .profile-stats > .list-group-item:hover {
+    text-decoration: none;
+    cursor: pointer; }
+
 .post {
   padding: 30px;
   font-size: 14px;
@@ -76,6 +86,10 @@ header {
     margin-left: 15px; }
   .post-content {
     margin: 7px 10px 40px 63px; }
+  .post-actions-btn {
+    position: absolute;
+    top: 30px;
+    right: 30px; }
   .post-action-list {
     position: absolute;
     bottom: 15px;

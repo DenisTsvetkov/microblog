@@ -8,6 +8,10 @@ header{
     background: $headerColor;
 }
 
+// .dropdown-toggle::after {
+//     display: none;
+// }
+
 .borderless{
     border:none;
 }
@@ -71,7 +75,24 @@ header{
         }
     }
 }
-
+.profile-stats{
+    & > .list-group-item{
+        color: $darkGray;
+        &>a{
+            color:$darkGray;
+            &:hover{
+                text-decoration: none;
+                
+            }
+        }
+        &:hover{
+            text-decoration: none;
+            cursor: pointer;
+            
+            
+        }
+    }
+}
 .post{
     padding: 30px;
     font-size: 14px;
@@ -102,6 +123,11 @@ header{
     }
     &-content{
         margin: 7px 10px 40px 63px;
+    }
+    &-actions-btn{
+        position: absolute;
+        top: 30px;
+        right: 30px;
     }
     &-action-list{
         position: absolute;

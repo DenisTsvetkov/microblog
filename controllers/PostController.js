@@ -1,51 +1,43 @@
-const Hotel = require('../models/Hotel');
+const db = require('../config/Db').db;
 
-exports.getAll = (req, res) => {
-    Hotel.all(function(error, data){
-        if(error){
-            console.log('Произошла ошибка: ', error);
-            return res.sendStatus(500);
-        }
-        else{
-            //data.this_css = "hotels";
-            console.log(data);
-            res.render("hotels", {Hotel: data, this_css:"hotels"});
-        }
-    });
-}
 
-exports.getInfo = (req, res) => {
-    let hotel_id = req.body.hotelId;
-    var result = {};
 
-    var sendResult = (result)=>{
-        console.log(result);
-        res.send(result);
+exports.create = (req, res) => {
+    console.log(req.body);
+    var user_id = req.body.id_user;
+    var post_text = req.body.post_text;
+
+    if(!user_id || !post_text) {
+        res.status(418).send('wrong data')
+        return;
     }
 
-    Hotel.getServices(hotel_id, function(error, data){
-        
-        if(error){
-            console.log('Произошла ошибка: ', error);
-            return res.sendStatus(500);
-        }
-        else{
-            result.services = data;
-        }
+    db.func('create_post', [user_id, post_text])
+    .then(data => {
+        var post_id = data[0];
+        res.redirect('back');
+    })
+    .catch(error => {
+        console.log('Error create post in ' + post_id + ':\n' + error);
+        res.send('501');
     });
-
-    Hotel.getEntertainments(hotel_id, function(error, data){
-    
-        if(error){
-            console.log('Произошла ошибка: ', error);
-            return res.sendStatus(500);
-        }
-        else{
-            result.entertainments = data;
-            sendResult(result);
-        }
-        
-    });
-
-    
 }
+
+exports.delete = (req, res) => {
+    var post_id = req.body.post_id;
+
+    if(!post_id) {
+        res.status(418).send('wrong data')
+        return;
+    }
+
+    db.func('delete_post', post_id)
+    .then(() => {
+        res.redirect('back');
+    })
+    .catch(error => {
+        console.log('Error create post in ' + post_id + ':\n' + error);
+        res.send('501');
+    });
+}
+
