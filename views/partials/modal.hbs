@@ -10,7 +10,7 @@
       <div class="modal-body">
             <form action="/new_message" method="POST">
                 <div class="form-group">
-                    <input type="hidden" name="id_user" value="{{data.id}}">
+                    <input type="hidden" name="id_user" value="{{loginedUser.id}}">
                     <label for="post_text" class="col-form-label">Текст сообщения:</label>
                     <textarea class="form-control" name="post_text" id="post_text" placeholder="Введите текст сообщение..." required></textarea>
                 </div>

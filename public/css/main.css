@@ -107,6 +107,12 @@ header {
     .post-action-list-value {
       margin-left: 5px; }
 
+.posts-not-found {
+  text-align: center;
+  color: #9A9A9A; }
+  .posts-not-found > p {
+    padding: 30px; }
+
 .sign-up-page {
   background-image: url("../img/sign-up-bg2.jpg");
   background-size: cover;

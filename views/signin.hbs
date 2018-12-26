@@ -19,8 +19,12 @@
                         <nav class="navbar navbar-light no-header-padding">
                             <a class="navbar-brand">!twitter</a>
                             <form class="form-inline" action="/signin" method="POST">
-                                <input class="form-control mr-sm-2" type="text" name="login" placeholder="Логин" aria-label="Login">
+                                <input class="form-control mr-sm-2" type="text" name="username" placeholder="Имя пользователя" aria-label="Username">
                                 <input class="form-control mr-sm-2" type="password" name="password" placeholder="Пароль" aria-label="Password">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" name="rememberMe" type="checkbox" id="inlineCheckbox1" value="option1" checked>
+                                    <label class="form-check-label" for="inlineCheckbox1">Запомнить меня</label>
+                                </div>
                                 <button class="btn btn-primary my-8 my-sm-0" type="submit">Войти</button>
                             </form>
                         </nav>
@@ -44,34 +48,34 @@
                     </div>
                     <div class="col-12 col-lg-6">
                         <div class="sign-up">
-                            <form>
+                            <form action="/signup" method="POST">
                                 <div class="form-group">
                                     <label for="InputName">Ваше имя</label>
-                                    <input type="text" class="form-control" id="InputName" placeholder="Введите ваше имя">
+                                    <input type="text" name="firstname" class="form-control" id="InputName" placeholder="Введите ваше имя">
                                 </div>
                                 <div class="form-group">
                                     <label for="InputSurname">Ваша фамилия</label>
-                                    <input type="text" class="form-control" id="InputSurname" placeholder="Введите вашую фамилию">
+                                    <input type="text" name="surname" class="form-control" id="InputSurname" placeholder="Введите вашую фамилию">
                                 </div>
                                 <div class="form-group">
                                     <label for="InputUsername">Имя пользователя</label>
                                     <div class="input-group-prepend">
                                         <div class="input-group-text" style="border-top-right-radius:0; border-bottom-right-radius:0; margin-right:-3px; z-index:2">@</div>
-                                        <input type="text" class="form-control" id="InputUsername" placeholder="Введите имя пользователя">
+                                        <input type="text" name="username" class="form-control" id="InputUsername" placeholder="Введите имя пользователя">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="InputEmail">Электронная почта</label>
-                                    <input type="email" class="form-control" id="InputEmail" placeholder="Введите электронную почту">
+                                    <input type="email" name="email" class="form-control" id="InputEmail" placeholder="Введите электронную почту">
                                     <small id="emailHelp" class="form-text text-muted">Электронная почта должна быть уникальна</small>
                                 </div>
                                 <div class="form-group">
                                     <label for="InputPassword1">Пароль</label>
-                                    <input type="password" class="form-control" id="InputPassword1" placeholder="Введите пароль">
+                                    <input type="password" name="password" class="form-control" id="InputPassword1" placeholder="Введите пароль">
                                 </div>
                                 <div class="form-group">
                                     <label for="InputPassword2">Повторите пароль</label>
-                                    <input type="password" class="form-control" id="InputPassword2" placeholder="Введите пароль ещё раз">
+                                    <input type="password" name="password2" class="form-control" id="InputPassword2" placeholder="Введите пароль ещё раз">
                                 </div>
                                 
                                 <button type="submit" class="btn btn-primary">Зарегистрироваться</button>

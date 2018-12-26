@@ -1,33 +1,72 @@
-var express = require('express');
-var router = express.Router();
 
 var users = require('./controllers/UserController');
 var posts = require('./controllers/PostController');
+var auth  = require('./controllers/AuthController');
 
-router.get('/', (req, res)=>{
+module.exports = (app, passport)=>{
+
+    function isLoggedIn(req, res, next) {
+        if (req.isAuthenticated())
+            return next();
     
-    // if(true){
-    //     res.redirect('/signin');
+        res.redirect('/signin');
+    }
+    
+    //console.log(passport);
+    // app.get('', isLoggedIn, (req, res)=>{
         
-    // }
-    res.render("index", {this_css:'main'});
-});
+    //     // if(true){
+    //     //     res.redirect('/signin');
+            
+    //     // }
+    //     res.render("index", {data: req['user'], this_css:'main'});
+    // });
 
+    app.get('/signout', isLoggedIn, function(req, res){
+        req.logout();
+        res.redirect('/signin');
+    });
 
+    app.get('/signin', auth.signin);
 
-router.get('/signin', (req, res)=>{
-    res.render("signin", {this_css:'main', layout: false})
-});
+    app.get('/:username', isLoggedIn, users.profile);
 
-router.get('/:username', users.profile);
+    
 
-//router.get('/profile', users.profile);
-router.post('/new_message', posts.create);
+    app.get('/', isLoggedIn, users.lenta);
 
-router.post('/delete_post', posts.delete);
+    app.post('/new_message', posts.create);
 
-router.post('/signin', users.signin);
+    app.post('/delete_post', posts.delete);
 
+    
 
+    app.post('/signup', passport.authenticate('local-signup', {
+        successRedirect: '/',
+        failureRedirect: '/signin',
+        failureFlash: true
+    }));
 
-module.exports = router;
+    // app.post('/signin', function(req, res, next) {
+    //     passport.authenticate('local-signin', function(err, user, info) {
+    //       if (err) { return next(err); }
+    //       if (!user) { return res.redirect('/signin'); }
+    //       req.logIn(user, function(err) {
+    //         if (err) { return next(err); }
+    //         return res.redirect('/' + user.username);
+    //       });
+    //     })(req, res, next);
+    //   });
+    app.post("/signin", passport.authenticate('local-signin',
+    { failureRedirect: '/signin',
+      failureFlash: true }), function(req, res) {
+        if (req.body.rememberMe) {
+          req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
+        } else {
+          req.session.cookie.expires = false; // Cookie expires at end of session
+        }
+      res.redirect('/'+req['user'].username);
+    });
+
+    
+};

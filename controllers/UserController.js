@@ -1,18 +1,5 @@
 const db = require('../config/Db').db;
 
-exports.getAll = (req, res) => {
-    User.all(function(error, data){
-        if(error){
-            console.log('Произошла ошибка: ', error);
-            return res.sendStatus(500);
-        }
-        else{
-            console.log(data);
-            res.render("index", {Hotel: data, this_css:"hotels"});
-        }
-    });
-}
-
 // exports.stats = (req, res) => {
 //     db.func('get_user_stats', req.params.username)
 //         .then(data => {
@@ -96,62 +83,60 @@ exports.getAll = (req, res) => {
 async function profile(req, res){
     const userProfile = {};
 
+    const loginedUser = await db.func('get_user_profile', req['user'].username);
+    userProfile.loginedUser = loginedUser[0];
+
     const data = await db.func('get_user_profile', req.params.username);
     userProfile.data = data[0];
+
+    
     
     const stats = await db.func('get_user_stats', req.params.username);
     userProfile.stats = stats[0];
 
     const posts = await db.func('get_all_user_posts', req.params.username);
     userProfile.posts = posts;
-
+    console.log('REQ PARAMS USERNAME', req.params.username)
+    req['user'].username == req.params.username ? userProfile.current_profile = true : userProfile.current_profile = false;
+    
+    //userProfile.loginedUser = req['user'];
     userProfile.this_css = 'main';
 
     console.log(userProfile)
+    if(userProfile.data == undefined){
+        res.render('notfound', userProfile);
+        exit();
+    }
     res.render('profile', userProfile);
 }
 
-exports.profile = profile;
+async function lenta(req, res){
+    const userProfile = {};
 
+    const loginedUser = await db.func('get_user_profile', req['user'].username);
+    userProfile.loginedUser = loginedUser[0];
 
-// async function signin(req,res){
-//     const userData = {};
+    // const data = await db.func('get_user_profile', req['user'].username);
+    // userProfile.data = data[0];
     
-//     const data = await db.func('get_user_profile', req.body.username);
-//     console.log(req.body);
-//     if(req.body.password == data[0].password){
-//         res.send('Вы успешно вошли');
-//     }
-//     else{
-//         res.send('Неправильно введет пароль');
-//     }
-//     res.send('Неправильно введет пароль');
-// }
+    const stats = await db.func('get_user_stats', req['user'].username);
+    userProfile.loginedUserStats = stats[0];
 
-exports.signin = (req, res) => {
-    var username = req.body.login;
-    var password = req.body.password;
+    // const posts = await db.func('get_all_user_posts', req.params.username);
+    // userProfile.posts = posts;
 
-    if(!username || !password) {
-        res.status(418).send('wrong data')
-        return;
-    }
+    req.params.username == req['user'].username ? userProfile.current_profile = true : userProfile.current_profile = false;
+    //userProfile.loginedUser = req['user'];
+    userProfile.this_css = 'main';
 
-    db.func('get_user_profile', username)
-    .then((data) => {
-        console.log(data);
-        if(data[0].password == password){
-            res.send('Вы успешно вошли');
-        }
-        else{
-            res.send('Неправильно введет пароль');
-        }
-    })
-    .catch(error => {
-        console.log('Error auth_user in ' + post_id + ':\n' + error);
-        res.send('501');
-    });
+    console.log(userProfile)
+    res.render('index', userProfile);
 }
+
+exports.profile = profile;
+exports.lenta = lenta;
+
+
 
 
 

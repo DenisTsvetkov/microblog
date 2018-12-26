@@ -6,23 +6,23 @@
                     <div class="profile-card">
                         <div class="profile-card-info d-flex justify-content-center flex-column align-items-center">
                             <div class="profile-card-avatar-mini">
-                                <img src="img/users/_Cvetkoff.jpg" alt="Rick Grimes">
+                                <img src="{{loginedUser.avatar_src}}" alt="Rick Grimes">
                             </div>
-                            <span class="profile-card-name">{{data.name}} {{data.surname}}</span>
-                            <a href="#" class="profile-card-username">@rick_grimes</a>
+                            <span class="profile-card-name">{{loginedUser.firstname}} {{loginedUser.surname}}</span>
+                            <a href="#" class="profile-card-username">@{{loginedUser.username}}</a>
                         </div>
                         <ul class="profile-stats list-group">
                             <li class="list-group-item d-flex justify-content-between align-items-center borderless">
                                 Записей
-                                <span class="badge badge-primary badge-pill">14</span>
+                                <span class="badge badge-primary badge-pill">{{loginedUserStats.posts}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center borderless">
                                 Подписок
-                                <span class="badge badge-primary badge-pill">2</span>
+                                <span class="badge badge-primary badge-pill">{{loginedUserStats.subscribtion}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center borderless">
                                 Подписчиков
-                                <span class="badge badge-primary badge-pill">1</span>
+                                <span class="badge badge-primary badge-pill">{{loginedUserStats.subscribes}}</span>
                             </li>
                         </ul>
                     </div>

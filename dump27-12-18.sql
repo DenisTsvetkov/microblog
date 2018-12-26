@@ -21,17 +21,42 @@ SET row_security = off;
 
 CREATE FUNCTION public.count_liked(_username character varying) RETURNS integer
     LANGUAGE plpgsql
-    AS $$
-declare
-res integer;
-begin
-	select count(*) from "Like" into res where id_user=get_user_id(_username);
-	return res;
-end;
+    AS $$
+declare
+res integer;
+begin
+	select count(*) from "Like" into res where id_user=get_user_id(_username);
+	return res;
+end;
 $$;
 
 
 ALTER FUNCTION public.count_liked(_username character varying) OWNER TO postgres;
+
+--
+-- Name: count_posts(character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.count_posts(_username character varying) RETURNS integer
+    LANGUAGE plpgsql
+    AS $$
+
+declare
+
+res integer;
+
+begin
+
+	select count(*) from "Post" into res where id_user=get_user_id(_username);
+
+	return res;
+
+end;
+
+$$;
+
+
+ALTER FUNCTION public.count_posts(_username character varying) OWNER TO postgres;
 
 --
 -- Name: count_subscribers(character varying); Type: FUNCTION; Schema: public; Owner: postgres
@@ -39,13 +64,13 @@ ALTER FUNCTION public.count_liked(_username character varying) OWNER TO postgres
 
 CREATE FUNCTION public.count_subscribers(_username character varying) RETURNS integer
     LANGUAGE plpgsql
-    AS $$
-declare
-res integer;
-begin
-	select count(*) from "Subscribe" into res where id_user_subscribe=get_user_id(_username);
-	return res;
-end;
+    AS $$
+declare
+res integer;
+begin
+	select count(*) from "Subscribe" into res where id_user_subscribe=get_user_id(_username);
+	return res;
+end;
 $$;
 
 
@@ -57,58 +82,120 @@ ALTER FUNCTION public.count_subscribers(_username character varying) OWNER TO po
 
 CREATE FUNCTION public.count_subscribtion(_username character varying) RETURNS integer
     LANGUAGE plpgsql
-    AS $$
-declare
-res integer;
-begin
-	select count(*) from "Subscribe" into res where id_user=get_user_id(_username);
-	return res;
-end;
+    AS $$
+declare
+res integer;
+begin
+	select count(*) from "Subscribe" into res where id_user=get_user_id(_username);
+	return res;
+end;
 $$;
 
 
 ALTER FUNCTION public.count_subscribtion(_username character varying) OWNER TO postgres;
 
 --
--- Name: create_user(character varying, character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: create_post(integer, text); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.create_user(_name character varying, _surname character varying, _login character varying, _password character varying, _email character varying) RETURNS void
+CREATE FUNCTION public.create_post(_user_id integer, _post_text text) RETURNS integer
     LANGUAGE plpgsql
-    AS $$
-DECLARE
-BEGIN
-	IF _email IS NULL OR length(_email) = 0 THEN
-		RAISE NOTICE 'Email is null or empty';
-	END IF;
-	IF _name IS NULL OR length(_name) = 0 THEN
-		RAISE NOTICE 'Name is null or empty';
-	END IF;
-    IF _surname IS NULL OR length(_surname) = 0 THEN
-		RAISE NOTICE 'Surname is null or empty';
-	END IF;
-	IF _password IS NULL or length(_password) = 0 THEN
-		RAISE NOTICE 'Password is null or empty';
-	END IF;
-
-	INSERT INTO "User" (name, surname, login, password, email)
-	VALUES 
-	(_name, _surname, _login, _password, _email);
-END;
+    AS $$
+
+DECLARE
+_post_id INTEGER;
+BEGIN
+	IF _post_text IS NULL OR length(_post_text) = 0 THEN
+		RAISE 'Post content is null or empty';
+	END IF;
+	
+	INSERT INTO "Post" (id_user, content) VALUES (_user_id, _post_text) RETURNING "Post".id INTO _post_id;
+	RETURN _post_id;
+EXCEPTION
+	WHEN foreign_key_violation THEN RAISE 'topic not exist';
+END
+
 $$;
 
 
-ALTER FUNCTION public.create_user(_name character varying, _surname character varying, _login character varying, _password character varying, _email character varying) OWNER TO postgres;
+ALTER FUNCTION public.create_post(_user_id integer, _post_text text) OWNER TO postgres;
+
+--
+-- Name: create_user(character varying, character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.create_user(_name character varying, _surname character varying, _username character varying, _password character varying, _email character varying) RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, email character varying, password character varying)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+BEGIN
+	IF _email IS NULL OR length(_email) = 0 THEN
+		RAISE NOTICE 'Email is null or empty';
+	END IF;
+	IF _name IS NULL OR length(_name) = 0 THEN
+		RAISE NOTICE 'Name is null or empty';
+	END IF;
+    IF _surname IS NULL OR length(_surname) = 0 THEN
+		RAISE NOTICE 'Surname is null or empty';
+	END IF;
+	IF _password IS NULL or length(_password) = 0 THEN
+		RAISE NOTICE 'Password is null or empty';
+	END IF;
+
+	INSERT INTO "User" (name, surname, username, password, email)
+	VALUES 
+	(_name, _surname, _username, _password, _email);
+
+	RETURN QUERY 
+		SELECT "User".id, "User".name, "User".surname, "User".username, "User".email, "User".password
+		FROM public."User"
+		WHERE "User".username = _username; 
+END;
+$$;
+
+
+ALTER FUNCTION public.create_user(_name character varying, _surname character varying, _username character varying, _password character varying, _email character varying) OWNER TO postgres;
+
+--
+-- Name: delete_post(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.delete_post(_post_id integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+	DELETE from "Post" WHERE id = _post_id;
+END
+
+$$;
+
+
+ALTER FUNCTION public.delete_post(_post_id integer) OWNER TO postgres;
+
+--
+-- Name: get_all_user_posts(character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.get_all_user_posts(_username character varying) RETURNS TABLE(id integer, content text, date timestamp without time zone)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+ RETURN QUERY SELECT "Post".id, "Post".content, "Post".date FROM "Post" where id_user = get_user_id(_username) ORDER by date DESC;
+END; $$;
+
+
+ALTER FUNCTION public.get_all_user_posts(_username character varying) OWNER TO postgres;
 
 --
 -- Name: get_all_users(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_all_users() RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, password character varying, email character varying)
+CREATE FUNCTION public.get_all_users() RETURNS TABLE(id integer, name character varying, surname character varying, login character varying, password character varying, email character varying)
     LANGUAGE plpgsql
     AS $$
 BEGIN
- RETURN QUERY SELECT "User".id, "User".name, "User".surname, "User".username, "User".password, "User".email FROM "User";
+ RETURN QUERY SELECT id, name, surname, login, password, email FROM "User";
 END; $$;
 
 
@@ -120,13 +207,13 @@ ALTER FUNCTION public.get_all_users() OWNER TO postgres;
 
 CREATE FUNCTION public.get_user_id(_username character varying) RETURNS integer
     LANGUAGE plpgsql
-    AS $$
-declare
-res integer;
-begin
-	select id from "User" into res where "User".username = _username;
-	return res;
-end
+    AS $$
+declare
+res integer;
+begin
+	select id from "User" into res where "User".username = _username;
+	return res;
+end
 $$;
 
 
@@ -136,34 +223,46 @@ ALTER FUNCTION public.get_user_id(_username character varying) OWNER TO postgres
 -- Name: get_user_profile(character varying); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_user_profile(_username character varying) RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, email character varying)
+CREATE FUNCTION public.get_user_profile(_username character varying) RETURNS TABLE(id integer, firstname character varying, surname character varying, username character varying, email character varying, password character varying, avatar_src text)
     LANGUAGE plpgsql
-    AS $$ 
-BEGIN 
-	RETURN QUERY 
-		SELECT "User".id, "User".name, "User".surname, "User".username, "User".email
-		FROM public."User"
-		WHERE "User".username = _username; 
-END; 
+    AS $$ 
+BEGIN 
+	RETURN QUERY 
+		SELECT "User".id, "User".name, "User".surname, "User".username, "User".email, "User".password, "User".avatar_src
+		FROM public."User"
+		WHERE "User".username = _username; 
+END; 
 $$;
 
 
 ALTER FUNCTION public.get_user_profile(_username character varying) OWNER TO postgres;
 
 --
--- Name: get_user_stats(character varying); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: get_user_profile_by_id(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_user_stats(_username character varying) RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, email character varying)
+CREATE FUNCTION public.get_user_profile_by_id(_id integer) RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, email character varying, password character varying, avatar_src text)
     LANGUAGE plpgsql
     AS $$ 
 BEGIN 
 	RETURN QUERY 
-		SELECT "User".id, "User".name, "User".surname, "User".username, "User".email
+		SELECT "User".id, "User".name, "User".surname, "User".username, "User".email, "User".password, "User".avatar_src
 		FROM public."User"
-		WHERE "User".username = _username; 
-
+		WHERE "User".id = _id; 
 END; 
+$$;
+
+
+ALTER FUNCTION public.get_user_profile_by_id(_id integer) OWNER TO postgres;
+
+--
+-- Name: get_user_stats(character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.get_user_stats(_username character varying) RETURNS TABLE(subscribtion integer, subscribes integer, posts integer, likes integer)
+    LANGUAGE sql
+    AS $$ 
+	select count_subscribtion(_username), count_subscribers(_username), count_posts(_username), count_liked(_username);
 $$;
 
 
@@ -287,7 +386,7 @@ CREATE TABLE public."Post" (
     id integer NOT NULL,
     id_user integer,
     content text,
-    date timestamp without time zone
+    date timestamp without time zone DEFAULT now()
 );
 
 
@@ -360,7 +459,8 @@ CREATE TABLE public."User" (
     surname character varying,
     username character varying,
     password character varying,
-    email character varying
+    email character varying,
+    avatar_src text DEFAULT 'img/users/default.png'::text
 );
 
 
@@ -506,6 +606,12 @@ COPY public."Poll" (id, id_post, body) FROM stdin;
 --
 
 COPY public."Post" (id, id_user, content, date) FROM stdin;
+15	1	Первый пост	2018-12-17 21:11:03.838471
+16	1	Здорова бандиты	2018-12-17 21:21:09.002066
+18	1	Привет мир	2018-12-19 20:39:08.351285
+23	15	ухуху	2018-12-26 20:50:27.503256
+24	16	Первый пост. Я сделал выход из системы	2018-12-26 23:18:41.708455
+25	17	Тестируем	2018-12-26 23:46:43.60598
 \.
 
 
@@ -524,11 +630,9 @@ COPY public."Subscribe" (id, id_user, id_user_subscribe) FROM stdin;
 -- Data for Name: User; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."User" (id, name, surname, username, password, email) FROM stdin;
-1	Денис	Цветков	Cvetkoff	solo59	denis.tsvetkov59@gmail.com
-2	Савелий	Вепрев	nakazan	123	nakazan@mail.ru
-3	Артем	Русских	russkikh	qwe	art@gmail.com
-4	Макси	Хохряков	maxflow	maxflex	max@flex.com
+COPY public."User" (id, name, surname, username, password, email, avatar_src) FROM stdin;
+16	Денис	Цветков	Cvetkoff	$2a$08$RzKa/f7iu9yr8TlW2mv4gOpH8a3weTMjv0rgB/8rdwO6ycOQ/FMue	denis.tsvetkov59@gmail.com	img/users/default.png
+17	Савелий	Вепрев	nakazan	$2a$08$crJCln4o1LHeB1VBCNaFpuuFN2l9DJzrqQOw92sWDzVO5Y1fhaXU6	nakazan@gmail.com	img/users/default.png
 \.
 
 
@@ -565,7 +669,7 @@ SELECT pg_catalog.setval('public."Poll_id_seq"', 1, false);
 -- Name: Post_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Post_id_seq"', 1, false);
+SELECT pg_catalog.setval('public."Post_id_seq"', 25, true);
 
 
 --
@@ -579,7 +683,7 @@ SELECT pg_catalog.setval('public."Subscribe_id_seq"', 3, true);
 -- Name: User_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."User_id_seq"', 4, true);
+SELECT pg_catalog.setval('public."User_id_seq"', 17, true);
 
 
 --

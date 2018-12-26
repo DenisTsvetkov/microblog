@@ -19,12 +19,12 @@
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {{data.name}} {{data.surname}}
+                                    {{loginedUser.firstname}} {{loginedUser.surname}}
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" href="/Cvetkoff"><i class="fas fa-user-circle"></i> Профиль</a>
-                                <a class="dropdown-item" href="#"><i class="fas fa-sliders-h"></i> Настройки</a>
-                                <a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                                <a class="dropdown-item" href="/{{loginedUser.username}}"><i class="fas fa-user-circle"></i> Профиль</a>
+                                <a class="dropdown-item" href="/settings"><i class="fas fa-sliders-h"></i> Настройки</a>
+                                <a class="dropdown-item" href="/signout"><i class="fas fa-sign-out-alt"></i> Выйти</a>
                                 </div>
                             </li>
                         </ul>
