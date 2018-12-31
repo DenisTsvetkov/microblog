@@ -1,90 +1,28 @@
 const db = require('../config/Db').db;
 
-// exports.stats = (req, res) => {
-//     db.func('get_user_stats', req.params.username)
-//         .then(data => {
-//             return data;
-//         })
-//         .catch(error => {
+async function all(req, res){
 
-//         })
-// }
+    const result = {};
 
-// exports.profile = (req, res) => {
-//     db.func('get_user_profile', req.params.username)
-//         .then(data => {
-//             let userProfile = {};
-//             if(data[0] != undefined){
-//                 userProfile.data = data[0];
-//                 db.func('get_user_stats', req.params.username)
-//                     .then(stats => {
-//                         userProfile.stats = stats[0];
-//                         userProfile.this_css="main";
-//                         res.render("profile", userProfile);
-//                 })
-//             }
-//             else{
-//                 res.send('404', 'Пользователь не найден')
-//             }
-//         })
-//         .catch(error => {
-//             console.log('Get user info: ' + req.params.username + ':\n' + error);
-//  		    res.send('501')
-//         })
-// }
+    result.loginedUser = req['user']
 
-// exports.stats = (req, res) => {
-//     db.func('get_user_stats', req.params.username)
-//         .then(data => {
-//             res.render("profile", {'stats':data[0], 'this_css':'main'});
-//         })
-//         .catch(error => {
+    const users = await db.func('all_users');
+    result.users = users;
 
-//         })
-// }
+    const stats = await db.func('get_user_stats', req['user'].username);
+    result.loginedUserStats = stats[0];
 
-// exports.profile = (req, res) => {
-//     db.func('get_user_profile', req.params.username)
-//         .then(data => {
-//             if(data[0] != undefined){
-                
-//                 res.render("profile", {'data':data[0], 'this_css':'main'});
-//                 //next();
-//             }
-//             else{
-//                 res.send('404', 'Пользователь не найден')
-//             }
-//         })
-//         .catch(error => {
-//             console.log('Get user info: ' + req.params.username + ':\n' + error);
-//  		    res.send('501')
-//         })
-// }
-// const getUserProfileData = () => {
-//     let userProfile = {};
-//     db.func('get_user_profile', req.params.username)
-//         .then(data => {
-           
-//         })
-// };
+    result.this_css = 'main';
+    console.log('Пользователи', result);
+    res.render('people', result);
+}
 
-// exports.userPosts = (req, res) => {
-//     db.func('create_post', [user_id, post_text])
-//     .then(data => {
-//         var post_id = data[0];
-//         res.redirect('back');
-//     })
-//     .catch(error => {
-//         console.log('Error create post in ' + post_id + ':\n' + error);
-//         res.send('501');
-//     });
-// }
 
 async function profile(req, res){
     const userProfile = {};
 
-    const loginedUser = await db.func('get_user_profile', req['user'].username);
-    userProfile.loginedUser = loginedUser[0];
+    //const loginedUser = await db.func('get_user_profile', req['user'].username);
+    userProfile.loginedUser = req['user'];
 
     const data = await db.func('get_user_profile', req.params.username);
     userProfile.data = data[0];
@@ -96,15 +34,19 @@ async function profile(req, res){
 
     const posts = await db.func('get_all_user_posts', req.params.username);
     userProfile.posts = posts;
-    console.log('REQ PARAMS USERNAME', req.params.username)
+    
     req['user'].username == req.params.username ? userProfile.current_profile = true : userProfile.current_profile = false;
     
-    //userProfile.loginedUser = req['user'];
+    if(userProfile.current_profile == false){
+        const is_subscribe = await db.func('is_subscribe', [userProfile.loginedUser.username, req.params.username]);
+        userProfile.subscribe = is_subscribe[0].is_subscribe;
+    }
+    
     userProfile.this_css = 'main';
 
     console.log(userProfile)
     if(userProfile.data == undefined){
-        res.render('notfound', userProfile);
+        res.status(404).render('notfound', userProfile);
         exit();
     }
     res.render('profile', userProfile);
@@ -113,11 +55,10 @@ async function profile(req, res){
 async function lenta(req, res){
     const userProfile = {};
 
-    const loginedUser = await db.func('get_user_profile', req['user'].username);
-    userProfile.loginedUser = loginedUser[0];
+    //const loginedUser = await db.func('get_user_profile', req['user'].username);
+    userProfile.loginedUser = req['user'];
 
-    // const data = await db.func('get_user_profile', req['user'].username);
-    // userProfile.data = data[0];
+
     
     const stats = await db.func('get_user_stats', req['user'].username);
     userProfile.loginedUserStats = stats[0];
@@ -133,8 +74,23 @@ async function lenta(req, res){
     res.render('index', userProfile);
 }
 
+async function subscribe(req, res){
+    if(req.body.action == 'subscribe'){
+        const subscribe = await db.func('subscribe', [req['user'].id, req.body.user_subscribe]);
+        subscribe[0].subscribe = true;
+        res.status(200).send(subscribe[0]);
+    }
+    else if(req.body.action == 'unsubscribe'){
+        const unsubscribe = await db.func('unsubscribe', [req['user'].id, req.body.user_subscribe]);
+        unsubscribe[0].unsubscribe = true;
+        res.status(200).send(unsubscribe[0]);
+    }
+}
+
+exports.all = all;
 exports.profile = profile;
 exports.lenta = lenta;
+exports.subscribe = subscribe;
 
 
 

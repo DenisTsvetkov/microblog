@@ -1,0 +1,45 @@
+<main class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-3">
+                <div class="dashboard">
+                    <div class="profile-card">
+                        <div class="profile-card-info d-flex justify-content-center flex-column align-items-center">
+                            <div class="profile-card-avatar-mini">
+                                <img src="{{loginedUser.avatar_src}}" alt="Rick Grimes">
+                            </div>
+                            <span class="profile-card-name">{{loginedUser.name}} {{loginedUser.surname}}</span>
+                            <a href="#" class="profile-card-username">@{{loginedUser.username}}</a>
+                        </div>
+                        <ul class="profile-stats list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
+                                Записей
+                                <span class="badge badge-primary badge-pill">{{loginedUserStats.posts}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
+                                Подписок
+                                <span class="badge badge-primary badge-pill">{{loginedUserStats.subscribtion}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
+                                Подписчиков
+                                <span class="badge badge-primary badge-pill">{{loginedUserStats.subscribes}}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-9">
+                <ul class="users">
+                    {{#each users}}
+                    <li>
+                        <a href="/{{this.username}}">
+                            <img src="{{this.avatar_src}}" alt="{{this.name}} {{this.surname}}">
+                            <span class="user-name">{{this.name}} {{this.surname}}</span>
+                        </a>
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>

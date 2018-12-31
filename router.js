@@ -22,6 +22,8 @@ module.exports = (app, passport)=>{
     //     res.render("index", {data: req['user'], this_css:'main'});
     // });
 
+    app.get('/', isLoggedIn, users.lenta);
+    
     app.get('/signout', isLoggedIn, function(req, res){
         req.logout();
         res.redirect('/signin');
@@ -29,17 +31,17 @@ module.exports = (app, passport)=>{
 
     app.get('/signin', auth.signin);
 
+    app.get('/people', isLoggedIn, users.all);
+
     app.get('/:username', isLoggedIn, users.profile);
 
     
-
-    app.get('/', isLoggedIn, users.lenta);
 
     app.post('/new_message', posts.create);
 
     app.post('/delete_post', posts.delete);
 
-    
+    app.post('/subscribe', users.subscribe);
 
     app.post('/signup', passport.authenticate('local-signup', {
         successRedirect: '/',
