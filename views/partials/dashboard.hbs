@@ -48,11 +48,11 @@
 
                 if(res.unsubscribe == true){
                     $('#subscribe-btn').removeClass('btn-secondary').addClass('btn-primary').data('action', 'subscribe').text('Подписаться');
-                    $('#subscribers > span').text(parseInt(($('#subscribers > span').text())-1));
+                    $('#subscribers > span').text(parseInt(($('#subscribers > span').text()))-1);
                 }
                 if(res.subscribe == true){
                     $('#subscribe-btn').removeClass('btn-primary').addClass('btn-secondary').data('action', 'unsubscribe').text('Отписаться');
-                    $('#subscribers > span').text(parseInt(($('#subscribers > span').text())+1));
+                    $('#subscribers > span').text(parseInt(($('#subscribers > span').text()))+1);
                 }
             
         })
