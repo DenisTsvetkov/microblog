@@ -16,6 +16,44 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: all_users(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.all_users() RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, email character varying, avatar_src text)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+ RETURN QUERY SELECT "User".id, "User".name, "User".surname, "User".username, "User".email, "User".avatar_src FROM "User";
+END; $$;
+
+
+ALTER FUNCTION public.all_users() OWNER TO postgres;
+
+--
+-- Name: comment_exist(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.comment_exist(_id_post integer, _logined_user integer) RETURNS boolean
+    LANGUAGE plpgsql
+    AS $$
+declare
+res boolean;
+BEGIN
+	select CASE 
+            	WHEN "Comment".id_user = _logined_user
+               		THEN true
+               		ELSE false 
+       			END as my_like 
+       		from "Comment" into res where id_post=_id_post;
+
+	return res;
+end;
+$$;
+
+
+ALTER FUNCTION public.comment_exist(_id_post integer, _logined_user integer) OWNER TO postgres;
+
+--
 -- Name: count_liked(character varying); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -69,7 +107,7 @@ declare
 res integer;
 begin
 	select count(*) from "Subscribe" into res where id_user_subscribe=get_user_id(_username);
-	return res;
+	return res-1;
 end;
 $$;
 
@@ -87,7 +125,7 @@ declare
 res integer;
 begin
 	select count(*) from "Subscribe" into res where id_user=get_user_id(_username);
-	return res;
+	return res-1;
 end;
 $$;
 
@@ -145,7 +183,9 @@ BEGIN
 	INSERT INTO "User" (name, surname, username, password, email)
 	VALUES 
 	(_name, _surname, _username, _password, _email);
-
+	insert into "Subscribe" (id_user, id_user_subscribe)
+	values
+	(get_user_id(_username), get_user_id(_username));
 	RETURN QUERY 
 		SELECT "User".id, "User".name, "User".surname, "User".username, "User".email, "User".password
 		FROM public."User"
@@ -174,32 +214,164 @@ $$;
 ALTER FUNCTION public.delete_post(_post_id integer) OWNER TO postgres;
 
 --
--- Name: get_all_user_posts(character varying); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: get_all_posts(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_all_user_posts(_username character varying) RETURNS TABLE(id integer, content text, date timestamp without time zone)
+CREATE FUNCTION public.get_all_posts(_logined_user integer) RETURNS TABLE(id integer, id_user integer, firstname character varying, surname character varying, username character varying, avatar_user text, content text, date timestamp without time zone, likes bigint, comments bigint, my_like boolean, my_comment boolean)
     LANGUAGE plpgsql
     AS $$
 BEGIN
- RETURN QUERY SELECT "Post".id, "Post".content, "Post".date FROM "Post" where id_user = get_user_id(_username) ORDER by date DESC;
-END; $$;
+ RETURN QUERY select "Post".id, "Post".id_user, "User".name, "User".surname, "User".username, "User".avatar_src, "Post".content, "Post".date, COUNT("Like".id), COUNT("Comment".id), CASE 
+            	WHEN "Like".id_user = _logined_user
+               		THEN true
+               		ELSE false 
+       			END as my_like,
+       			CASE 
+            	WHEN "Comment".id_user = _logined_user
+               		THEN true
+               		ELSE false 
+       			END as my_comment
+			  FROM "Post"
+			  join "Subscribe" on ("Subscribe".id_user = _logined_user and "Post".id_user = "Subscribe".id_user_subscribe)
+			  left join "User" on ("User".id = "Post".id_user)
+			  left join "Like" on ("Like".id_post = "Post".id)
+			  left join "Comment" on ("Comment".id_post = "Post".id)
+			  GROUP BY "Post".id, "Like".id_user, "Comment".id_user, "User".id
+			  order by "Post".date desc;
+end;
+$$;
 
 
-ALTER FUNCTION public.get_all_user_posts(_username character varying) OWNER TO postgres;
+ALTER FUNCTION public.get_all_posts(_logined_user integer) OWNER TO postgres;
 
 --
--- Name: get_all_users(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: get_all_user_posts(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_all_users() RETURNS TABLE(id integer, name character varying, surname character varying, login character varying, password character varying, email character varying)
+CREATE FUNCTION public.get_all_user_posts(_current_user integer) RETURNS TABLE(id integer, content text, date timestamp without time zone, likes bigint, comments bigint, my_like boolean, my_comment boolean)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+ RETURN QUERY SELECT "Post".id, "Post".content, "Post".date, COUNT("Like".id), COUNT("Comment".id), CASE 
+            	WHEN "Like".id_user = _current_user
+               		THEN true
+               		ELSE false 
+       			END as my_like,
+       			CASE 
+            	WHEN "Comment".id_user = _current_user
+               		THEN true
+               		ELSE false 
+       			END as my_comment
+			  FROM "Post"
+			  left join "Like" on ("Like".id_post = "Post".id)
+			  left join "Comment" on ("Comment".id_post = "Post".id)
+			  where "Post".id_user = _current_user
+			  GROUP BY "Post".id, "Like".id_user, "Comment".id_user;
+end;
+$$;
+
+
+ALTER FUNCTION public.get_all_user_posts(_current_user integer) OWNER TO postgres;
+
+--
+-- Name: get_all_user_posts(character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.get_all_user_posts(_current_user character varying) RETURNS TABLE(id integer, content text, date timestamp without time zone, likes bigint, comments bigint, my_like boolean, my_comment boolean)
     LANGUAGE plpgsql
     AS $$
 BEGIN
- RETURN QUERY SELECT id, name, surname, login, password, email FROM "User";
+ RETURN QUERY SELECT "Post".id, "Post".content, "Post".date, COUNT("Like".id), COUNT("Comment".id), CASE 
+            	WHEN "Like".id_user = get_user_id(_current_user)
+               		THEN true
+               		ELSE false 
+       			END as my_like,
+       			CASE 
+            	WHEN "Comment".id_user = get_user_id(_current_user)
+               		THEN true
+               		ELSE false 
+       			END as my_comment
+			  FROM "Post"
+			  left join "Like" on ("Like".id_post = "Post".id)
+			  left join "Comment" on ("Comment".id_post = "Post".id)
+			  where "Post".id_user = get_user_id(_current_user)
+			  GROUP BY "Post".id, "Like".id_user, "Comment".id_user;
+end;
+$$;
+
+
+ALTER FUNCTION public.get_all_user_posts(_current_user character varying) OWNER TO postgres;
+
+--
+-- Name: get_all_user_posts(character varying, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.get_all_user_posts(_current_user character varying, _logined_user integer) RETURNS TABLE(id integer, content text, date timestamp without time zone, likes integer, comments integer, my_like boolean, my_comment boolean)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+ RETURN QUERY SELECT "Post".id, "Post".content, "Post".date, get_count_likes_post("Post".id), get_count_comments_post("Post".id), like_exist("Post".id, _logined_user), comment_exist("Post".id, _logined_user)
+			  FROM "Post"
+			  where "Post".id_user = get_user_id(_current_user)
+			  order by "Post".date DESC;
+end;
+$$;
+
+
+ALTER FUNCTION public.get_all_user_posts(_current_user character varying, _logined_user integer) OWNER TO postgres;
+
+--
+-- Name: get_count_comments_post(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.get_count_comments_post(_id_post integer) RETURNS integer
+    LANGUAGE plpgsql
+    AS $$
+declare
+res integer;
+BEGIN
+	select count(*) from "Comment" into res where id_post=_id_post;
+	return res;
+end;
+$$;
+
+
+ALTER FUNCTION public.get_count_comments_post(_id_post integer) OWNER TO postgres;
+
+--
+-- Name: get_count_likes_post(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.get_count_likes_post(_id_post integer) RETURNS integer
+    LANGUAGE plpgsql
+    AS $$
+declare
+res integer;
+BEGIN
+	select count(*) from "Like" into res where id_post=_id_post;
+	return res;
+end;
+$$;
+
+
+ALTER FUNCTION public.get_count_likes_post(_id_post integer) OWNER TO postgres;
+
+--
+-- Name: get_post_comments(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.get_post_comments(_post_id integer) RETURNS TABLE(id_comment integer, content text, date timestamp with time zone, id_user integer, firstname character varying, surname character varying, username character varying, email character varying, avatar_src text)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+ RETURN QUERY SELECT "Comment".id, "Comment".content, "Comment".date, "Comment".id_user, "User".name, "User".surname, "User".username, "User".email, "User".avatar_src 
+ from "Comment" 
+ left join "User" on ("Comment".id_user = "User".id)
+ where "Comment".id_post = _post_id;
 END; $$;
 
 
-ALTER FUNCTION public.get_all_users() OWNER TO postgres;
+ALTER FUNCTION public.get_post_comments(_post_id integer) OWNER TO postgres;
 
 --
 -- Name: get_user_id(character varying); Type: FUNCTION; Schema: public; Owner: postgres
@@ -268,6 +440,131 @@ $$;
 
 ALTER FUNCTION public.get_user_stats(_username character varying) OWNER TO postgres;
 
+--
+-- Name: is_subscribe(character varying, character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.is_subscribe(_current_username character varying, _username character varying) RETURNS boolean
+    LANGUAGE plpgsql
+    AS $$
+declare
+res boolean;
+begin
+	SELECT EXISTS (SELECT id_user, id_user_subscribe from "Subscribe" where id_user = get_user_id(_current_username) and id_user_subscribe = get_user_id(_username)) into res;
+	return res;
+end;
+
+$$;
+
+
+ALTER FUNCTION public.is_subscribe(_current_username character varying, _username character varying) OWNER TO postgres;
+
+--
+-- Name: like(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public."like"(_current_user integer, _post_like integer) RETURNS TABLE(id integer, id_user integer, id_user_subscribe integer)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+BEGIN
+
+	INSERT INTO "Like" (id_user, id_post)
+	VALUES 
+	(_current_user, _post_like);
+
+	RETURN QUERY 
+		SELECT "Like".id, "Like".id_user, "Like".id_post
+		FROM public."Like"
+		WHERE "Like".id_user = _current_user and "Like".id_post = _post_like; 
+END;
+$$;
+
+
+ALTER FUNCTION public."like"(_current_user integer, _post_like integer) OWNER TO postgres;
+
+--
+-- Name: like_exist(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.like_exist(_id_post integer, _logined_user integer) RETURNS boolean
+    LANGUAGE plpgsql
+    AS $$
+declare
+res boolean;
+BEGIN
+	select CASE 
+            	WHEN "Like".id_user = _logined_user
+               		THEN true
+               		ELSE false 
+       			END as my_like 
+       		from "Like" into res where id_post=_id_post;
+
+	return res;
+end;
+$$;
+
+
+ALTER FUNCTION public.like_exist(_id_post integer, _logined_user integer) OWNER TO postgres;
+
+--
+-- Name: subscribe(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.subscribe(_current_user integer, _user_subscribe integer) RETURNS TABLE(id integer, id_user integer, id_user_subscribe integer)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+BEGIN
+
+	INSERT INTO "Subscribe" (id_user, id_user_subscribe)
+	VALUES 
+	(_current_user, _user_subscribe);
+
+	RETURN QUERY 
+		SELECT "Subscribe".id, "Subscribe".id_user, "Subscribe".id_user_subscribe 
+		FROM public."Subscribe"
+		WHERE "Subscribe".id_user = _current_user and "Subscribe".id_user_subscribe = _user_subscribe; 
+END;
+$$;
+
+
+ALTER FUNCTION public.subscribe(_current_user integer, _user_subscribe integer) OWNER TO postgres;
+
+--
+-- Name: unlike(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.unlike(_current_user_id integer, _post_like integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+	DELETE from "Like" WHERE id_user = _current_user_id and id_post = _post_like;
+end;
+
+$$;
+
+
+ALTER FUNCTION public.unlike(_current_user_id integer, _post_like integer) OWNER TO postgres;
+
+--
+-- Name: unsubscribe(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.unsubscribe(_current_user_id integer, _user_subscribe_id integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+	DELETE from "Subscribe" WHERE id_user = _current_user_id and id_user_subscribe = _user_subscribe_id;
+END
+
+$$;
+
+
+ALTER FUNCTION public.unsubscribe(_current_user_id integer, _user_subscribe_id integer) OWNER TO postgres;
+
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -280,7 +577,8 @@ CREATE TABLE public."Comment" (
     id integer NOT NULL,
     id_user integer,
     id_post integer,
-    content text
+    content text,
+    date timestamp with time zone DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -577,7 +875,10 @@ ALTER TABLE ONLY public."Vote" ALTER COLUMN id SET DEFAULT nextval('public."Vote
 -- Data for Name: Comment; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."Comment" (id, id_user, id_post, content) FROM stdin;
+COPY public."Comment" (id, id_user, id_post, content, date) FROM stdin;
+3	16	34	Короче это крутой пост	2019-01-02 22:15:29.035501+00
+4	16	34	Проверка	2019-01-02 22:15:40.604837+00
+5	18	34	Фига чё ты написал Дениска	2019-01-03 13:26:21.235445+00
 \.
 
 
@@ -586,10 +887,9 @@ COPY public."Comment" (id, id_user, id_post, content) FROM stdin;
 --
 
 COPY public."Like" (id, id_user, id_post) FROM stdin;
-1	1	1
-2	1	2
-3	1	3
-4	1	4
+59	16	34
+61	16	38
+82	21	40
 \.
 
 
@@ -606,12 +906,12 @@ COPY public."Poll" (id, id_post, body) FROM stdin;
 --
 
 COPY public."Post" (id, id_user, content, date) FROM stdin;
-15	1	Первый пост	2018-12-17 21:11:03.838471
-16	1	Здорова бандиты	2018-12-17 21:21:09.002066
-18	1	Привет мир	2018-12-19 20:39:08.351285
-23	15	ухуху	2018-12-26 20:50:27.503256
-24	16	Первый пост. Я сделал выход из системы	2018-12-26 23:18:41.708455
-25	17	Тестируем	2018-12-26 23:46:43.60598
+33	17	Пост Савелия	2019-01-02 19:29:08.61344
+34	16	Пост Дениса	2019-01-02 19:29:42.403691
+35	18	fds	2019-01-02 21:24:32.24742
+36	18	авы	2019-01-02 21:36:31.832844
+37	18	Проверка	2019-01-03 10:48:33.881464
+38	19	Первый пост	2019-01-03 13:59:33.462765
 \.
 
 
@@ -620,9 +920,17 @@ COPY public."Post" (id, id_user, content, date) FROM stdin;
 --
 
 COPY public."Subscribe" (id, id_user, id_user_subscribe) FROM stdin;
-1	1	2
-2	1	3
-3	1	4
+44	16	17
+45	18	17
+46	16	16
+47	17	17
+48	18	18
+49	18	16
+51	21	21
+52	22	22
+53	23	23
+54	24	24
+55	25	25
 \.
 
 
@@ -631,8 +939,14 @@ COPY public."Subscribe" (id, id_user, id_user_subscribe) FROM stdin;
 --
 
 COPY public."User" (id, name, surname, username, password, email, avatar_src) FROM stdin;
-16	Денис	Цветков	Cvetkoff	$2a$08$RzKa/f7iu9yr8TlW2mv4gOpH8a3weTMjv0rgB/8rdwO6ycOQ/FMue	denis.tsvetkov59@gmail.com	img/users/default.png
-17	Савелий	Вепрев	nakazan	$2a$08$crJCln4o1LHeB1VBCNaFpuuFN2l9DJzrqQOw92sWDzVO5Y1fhaXU6	nakazan@gmail.com	img/users/default.png
+16	Денис	Цветков	Cvetkoff	$2a$08$RzKa/f7iu9yr8TlW2mv4gOpH8a3weTMjv0rgB/8rdwO6ycOQ/FMue	denis.tsvetkov59@gmail.com	img/users/_Cvetkoff.jpg
+17	Савелий	Вепрев	nakazan	$2a$08$crJCln4o1LHeB1VBCNaFpuuFN2l9DJzrqQOw92sWDzVO5Y1fhaXU6	nakazan@gmail.com	img/users/_nakazan.jpg
+18	Артем	Русских	artem	$2a$08$vNoM7i5SOaz0LfoG.W8u7.Dor6ikiZMlrgHh1jesAYUBlwJJQt4gG	russkikh@gmail.com	img/users/default.png
+21	Рома	Двинянинов	roma	$2a$08$3UdfwYtrBE2oHl8ua11Ng.QR5OhKylBCAbZj0uEFrTHi3vcgj19UW	roma@mail.ru	img/users/default.png
+22	Максим	Хохряков	max	$2a$08$kuFJz1YLbXs.oQrt8zsCrOV7l6NzcgMIFwIV8aeM/klz.8s6I2deG	max@gmail.ru	img/users/default.png
+23	Егор	Ломакин	knyaz	$2a$08$zTewM0yF8VDPNSZoFqlw2uN4oE4T6cKhEWfS4EOw1C5uMbVlrITB6	egor@gmail.com	img/users/default.png
+24	Алексей	Бурмантов	leha	$2a$08$2NtVvhVnnH75Uhshmy/bjOTKzs2mOIgNq0o6uGQTdfj5Nk58Tamdu	leha@mail.ru	img/users/default.png
+25	Илья	Оконешников	ilya	$2a$08$lvMvWRtseNvgl0QlLhVV6OmzhuRcYlbbSYHmGc0eTEuQcNdeLvE7a	ilya@mail.ru	img/users/default.png
 \.
 
 
@@ -648,14 +962,14 @@ COPY public."Vote" (id, id_poll, id_user, answer) FROM stdin;
 -- Name: Comment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Comment_id_seq"', 1, false);
+SELECT pg_catalog.setval('public."Comment_id_seq"', 5, true);
 
 
 --
 -- Name: Like_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Like_id_seq"', 4, true);
+SELECT pg_catalog.setval('public."Like_id_seq"', 82, true);
 
 
 --
@@ -669,21 +983,21 @@ SELECT pg_catalog.setval('public."Poll_id_seq"', 1, false);
 -- Name: Post_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Post_id_seq"', 25, true);
+SELECT pg_catalog.setval('public."Post_id_seq"', 40, true);
 
 
 --
 -- Name: Subscribe_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Subscribe_id_seq"', 3, true);
+SELECT pg_catalog.setval('public."Subscribe_id_seq"', 57, true);
 
 
 --
 -- Name: User_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."User_id_seq"', 17, true);
+SELECT pg_catalog.setval('public."User_id_seq"', 25, true);
 
 
 --

@@ -17,6 +17,9 @@ header {
 .liked {
   color: #D71A44; }
 
+.comment-exist {
+  color: #1E94D2; }
+
 .main {
   padding-top: 10px; }
 
@@ -107,11 +110,20 @@ header {
     .post-action-list-value {
       margin-left: 5px; }
 
+#gridSystemModal .post {
+  padding: 0 !important; }
+
 .posts-not-found {
   text-align: center;
   color: #9A9A9A; }
   .posts-not-found > p {
     padding: 30px; }
+
+.comments-not-found {
+  text-align: center;
+  color: #9A9A9A; }
+  .comments-not-found > p {
+    padding: 15px; }
 
 .sign-up-page {
   background-image: url("../img/sign-up-bg2.jpg");
@@ -154,3 +166,48 @@ header {
         width: 100%;
         text-align: center;
         font-size: 14px; }
+
+.post-comments > h6 {
+  margin-bottom: 30px; }
+
+.comment {
+  font-size: 14px;
+  background-color: #fff;
+  position: relative;
+  margin-bottom: 3px; }
+  .comment-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+    float: left; }
+    .comment-avatar > img {
+      height: 100%; }
+  .comment-name {
+    color: #3C3C3C;
+    font-weight: 700; }
+  .comment-username {
+    color: #B7B7B7; }
+  .comment-created-date {
+    color: #B7B7B7;
+    margin-left: 15px; }
+  .comment-content {
+    margin: 7px 10px 40px 50px; }
+
+.poll-option {
+  margin: 0;
+  padding: 0;
+  list-style: none; }
+  .poll-option > li {
+    margin-bottom: 5px; }
+    .poll-option > li > input {
+      width: 100%;
+      padding: 0 7px;
+      border-radius: 3px;
+      border: 1px solid #A7A7A7; }
+  .poll-option-title {
+    margin-right: 20px;
+    width: 100px; }
+  .poll-option-remove {
+    margin-left: 10px; }

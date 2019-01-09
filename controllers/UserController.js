@@ -32,7 +32,7 @@ async function profile(req, res){
     const stats = await db.func('get_user_stats', req.params.username);
     userProfile.stats = stats[0];
 
-    const posts = await db.func('get_all_user_posts', req.params.username);
+    const posts = await db.func('get_all_user_posts', [req.params.username, req['user'].id]);
     userProfile.posts = posts;
     
     req['user'].username == req.params.username ? userProfile.current_profile = true : userProfile.current_profile = false;
@@ -58,16 +58,12 @@ async function lenta(req, res){
     //const loginedUser = await db.func('get_user_profile', req['user'].username);
     userProfile.loginedUser = req['user'];
 
-
-    
     const stats = await db.func('get_user_stats', req['user'].username);
     userProfile.loginedUserStats = stats[0];
 
-    // const posts = await db.func('get_all_user_posts', req.params.username);
-    // userProfile.posts = posts;
+    const allPosts = await db.func('get_all_posts', req['user'].id);
+    userProfile.allPosts = allPosts;
 
-    req.params.username == req['user'].username ? userProfile.current_profile = true : userProfile.current_profile = false;
-    //userProfile.loginedUser = req['user'];
     userProfile.this_css = 'main';
 
     console.log(userProfile)

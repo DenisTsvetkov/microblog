@@ -1,5 +1,5 @@
 <div class="dashboard">
-    <div class="profile-card">
+    <div class="profile-card" data-id="{{data.id}}">
         <div class="profile-card-info d-flex justify-content-center flex-column align-items-center">
             <div class="profile-card-avatar">
                 <img src="{{data.avatar_src}}" alt="Rick Grimes">
@@ -20,7 +20,7 @@
                 <a href="/{{data.username}}/subscribers/">Подписчиков</a>
                 <span class="badge badge-primary badge-pill">{{stats.subscribes}}</span>
             </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
+            <li class="list-group-item d-flex justify-content-between align-items-center borderless" id="count-liked-posts">
                 <a href="/{{data.username}}/liked_posts/">Понравилось постов</a>
                 <span class="badge badge-primary badge-pill">{{stats.likes}}</span>
             </li>
@@ -37,24 +37,4 @@
         {{/if}}
     {{/if}}
 </div>
-<script src="js/ajax.js"></script>
-<script>
-    $('#subscribe-btn').on('click', function(e){
-        e.preventDefault();
-        AJAX('/subscribe', 'POST', {
-            'action':$(this).data('action'), 
-            'user_subscribe':'{{data.id}}'
-        }, function(res){
-
-                if(res.unsubscribe == true){
-                    $('#subscribe-btn').removeClass('btn-secondary').addClass('btn-primary').data('action', 'subscribe').text('Подписаться');
-                    $('#subscribers > span').text(parseInt(($('#subscribers > span').text()))-1);
-                }
-                if(res.subscribe == true){
-                    $('#subscribe-btn').removeClass('btn-primary').addClass('btn-secondary').data('action', 'unsubscribe').text('Отписаться');
-                    $('#subscribers > span').text(parseInt(($('#subscribers > span').text()))+1);
-                }
-            
-        })
-    })
-</script>
+<script src="js/subscribe.js"></script>

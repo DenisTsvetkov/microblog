@@ -7,9 +7,12 @@ module.exports = (app, passport)=>{
 
     function isLoggedIn(req, res, next) {
         if (req.isAuthenticated())
+        {
             return next();
-    
-        res.redirect('/signin');
+        }
+        else{
+            res.redirect('/signin');
+        }
     }
     
     //console.log(passport);
@@ -33,6 +36,10 @@ module.exports = (app, passport)=>{
 
     app.get('/people', isLoggedIn, users.all);
 
+    app.get('/profile', isLoggedIn, function(req,res){
+        res.redirect('/'+req['user'].username);
+    })
+
     app.get('/:username', isLoggedIn, users.profile);
 
     
@@ -43,11 +50,15 @@ module.exports = (app, passport)=>{
 
     app.post('/subscribe', users.subscribe);
 
+    app.post('/like', posts.like);
+
     app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect: '/',
+        successRedirect: '/profile',
         failureRedirect: '/signin',
         failureFlash: true
     }));
+    
+    app.post('/post-info', posts.info);
 
     // app.post('/signin', function(req, res, next) {
     //     passport.authenticate('local-signin', function(err, user, info) {

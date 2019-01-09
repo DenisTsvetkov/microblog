@@ -1,0 +1,46 @@
+<div id="gridSystemModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="gridModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-12">
+                <div class="post" data-id="">
+                    <div class="post-avatar">
+                        <img src="" alt="" class="align-bottom">
+                    </div>
+                    <span class="post-name"></span>
+                    <span class="post-username">@</span>
+                    <span class="post-created-date"></span>
+                    <p class="post-content"></p>
+                    {{!-- <div class="post-action-list">
+                        <a class="post-comments"><i class="fas fa-comments"></i><span class="post-action-list-value">2</span></a>
+                        <a class="post-likes"><i class="fas fa-heart"></i><span class="post-action-list-value">10</span></a>
+                    </div> --}}
+                </div>
+            </div>
+            <div class="col-12">
+                <form action="/new_comment" method="POST">
+                    <div class="form-group d-flex justify-content-end flex-wrap">
+                        <input type="hidden" name="id_user" value="{{loginedUser.id}}">
+                        <textarea class="form-control" name="post_text" id="post_text" placeholder="Напишите комментарий..." required></textarea>
+                        <button type="submit" class="btn btn-success btn-sm" style="margin: 5px 0"><i class="far fa-edit"></i> Отправить</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-12">
+                <div class="post-comments">
+                  <h6>Комментарии пользователей</h6>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

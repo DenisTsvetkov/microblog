@@ -4,8 +4,12 @@ const expressHbs = require("express-handlebars");
 const passport   = require('passport');
 const session    = require('express-session');
 var flash = require('connect-flash');
+const favicon = require('express-favicon');
 
 const app = express();
+
+
+app.use(favicon(__dirname + '/public/img/favicon.ico'));
 
 // For Handlebars
 app.engine("hbs", expressHbs(

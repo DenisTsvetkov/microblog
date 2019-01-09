@@ -41,3 +41,27 @@ exports.delete = (req, res) => {
     });
 }
 
+async function like(req, res){
+    if(req.body.action == 'like'){
+        const like = await db.func('like', [req['user'].id, req.body.post_id]);
+        like[0].like = true;
+        res.status(200).send(like[0]);
+    }
+    else if(req.body.action == 'unlike'){
+        const unlike = await db.func('unlike', [req['user'].id, req.body.post_id]);
+        unlike[0].unlike = true;
+        res.status(200).send(unlike[0]);
+    }
+}
+
+exports.like = like;
+
+async function info(req, res){
+    const postComments = await db.func('get_post_comments', req.body.post_id);
+    let postInfo = {};
+    postInfo.postComments = postComments;
+    console.log('Комменты', postInfo);
+    res.status(200).send(postInfo);
+}
+
+exports.info = info;

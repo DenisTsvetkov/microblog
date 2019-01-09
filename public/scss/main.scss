@@ -29,6 +29,10 @@ header{
     color:$likedColor;
 }
 
+.comment-exist{
+    color:$lightBlue;
+}
+
 .main{
     padding-top: 10px;
 }
@@ -152,11 +156,23 @@ header{
     }
 }
 
+#gridSystemModal .post{
+    padding: 0 !important;
+}
+
 .posts-not-found{
     text-align: center;
     color: #9A9A9A;
     &>p{
         padding: 30px;
+    }
+}
+
+.comments-not-found{
+    text-align: center;
+    color: #9A9A9A;
+    &>p{
+        padding: 15px;
     }
 }
 
@@ -212,4 +228,66 @@ header{
             }
         }
     }
+}
+
+.post-comments > h6{
+    margin-bottom: 30px;
+}
+
+.comment{
+    font-size: 14px;
+    background-color: $elemBgColor;
+    position: relative;
+    margin-bottom: 3px;
+    &-avatar{
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 15px;
+        float:left;
+        &>img{
+            height: 100%;
+        }
+    }
+    &-name{
+        color:$darkGray;
+        font-weight: 700;
+    }
+    &-username{
+        color:$lightGray;
+    }
+    &-created-date{
+        color:$lightGray;
+        margin-left:15px;
+    }
+    &-content{
+        margin: 7px 10px 40px 50px;
+    }
+    
+}
+
+.poll{
+    &-option{
+        margin: 0;
+        padding: 0;
+        list-style:none;
+        & > li{
+            margin-bottom: 5px;
+            & > input{
+                width: 100%;
+                padding: 0 7px;
+                border-radius: 3px;
+                border: 1px solid #A7A7A7;
+            }
+        }
+        &-title{
+            margin-right: 20px;
+            width: 100px;
+        }
+        &-remove{
+            margin-left: 10px;
+        }
+    }
+    
 }
