@@ -101,10 +101,12 @@ module.exports = function(passport){
         db.func('get_user_profile', username).then(function (user) {
             //console.log('GeT USET PROFILE', user);
         if (!user[0]) {
+            console.log('User does not exist')
             return done(null, false, { message: 'User does not exist' });
         }
 
         if (!isValidPassword(user[0].password,password)) {
+            console.log('Incorrect password.')
             return done(null, false, { message: 'Incorrect password.' });
         }
 

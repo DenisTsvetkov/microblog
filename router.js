@@ -8,7 +8,7 @@ module.exports = (app, passport)=>{
     function isLoggedIn(req, res, next) {
         if (req.isAuthenticated())
         {
-            return next();
+            next();
         }
         else{
             res.redirect('/signin');
@@ -52,11 +52,22 @@ module.exports = (app, passport)=>{
 
     app.post('/like', posts.like);
 
-    app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect: '/profile',
-        failureRedirect: '/signin',
-        failureFlash: true
-    }));
+    // app.post('/signup', passport.authenticate('local-signup', {
+    //     successRedirect: '/profile',
+    //     failureRedirect: '/signin',
+    //     failureFlash: true
+    // }));
+
+    app.post("/signup", passport.authenticate('local-signup',
+    { failureRedirect: '/signin',
+      failureFlash: true }), function(req, res) {
+        if (req.body.rememberMe) {
+          req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
+        } else {
+          req.session.cookie.expires = false; // Cookie expires at end of session
+        }
+      res.redirect('/'+req['user'].username);
+    });
     
     app.post('/post-info', posts.info);
 

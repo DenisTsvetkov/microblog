@@ -37,16 +37,15 @@ CREATE FUNCTION public.comment_exist(_id_post integer, _logined_user integer) RE
     LANGUAGE plpgsql
     AS $$
 declare
-res boolean;
+count_row integer;
 BEGIN
-	select CASE 
-            	WHEN "Comment".id_user = _logined_user
-               		THEN true
-               		ELSE false 
-       			END as my_like 
-       		from "Comment" into res where id_post=_id_post;
-
-	return res;
+	select count(*) from "Comment" into count_row where id_post = _id_post and id_user = _logined_user;
+
+	if(count_row = 0) then
+		return false;
+	else
+		return true;
+	end if;
 end;
 $$;
 
@@ -217,26 +216,26 @@ ALTER FUNCTION public.delete_post(_post_id integer) OWNER TO postgres;
 -- Name: get_all_posts(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_all_posts(_logined_user integer) RETURNS TABLE(id integer, id_user integer, firstname character varying, surname character varying, username character varying, avatar_user text, content text, date timestamp without time zone, likes bigint, comments bigint, my_like boolean, my_comment boolean)
+CREATE FUNCTION public.get_all_posts(_logined_user integer) RETURNS TABLE(id integer, id_user integer, firstname character varying, surname character varying, username character varying, avatar_user text, content text, date timestamp without time zone, likes integer, comments integer, my_like boolean, my_comment boolean)
     LANGUAGE plpgsql
     AS $$
 BEGIN
- RETURN QUERY select "Post".id, "Post".id_user, "User".name, "User".surname, "User".username, "User".avatar_src, "Post".content, "Post".date, COUNT("Like".id), COUNT("Comment".id), CASE 
-            	WHEN "Like".id_user = _logined_user
-               		THEN true
-               		ELSE false 
-       			END as my_like,
-       			CASE 
-            	WHEN "Comment".id_user = _logined_user
-               		THEN true
-               		ELSE false 
-       			END as my_comment
+ RETURN QUERY select "Post".id, 
+ 					 "Post".id_user, 
+ 					 "User".name,
+ 					 "User".surname, 
+ 					 "User".username, 
+ 					 "User".avatar_src, 
+ 					 "Post".content, 
+ 					 "Post".date, 
+ 					 get_count_likes_post("Post".id), 
+ 					 get_count_comments_post("Post".id), 
+ 					 like_exist("Post".id, _logined_user), 
+ 					 comment_exist("Post".id, _logined_user)
 			  FROM "Post"
-			  join "Subscribe" on ("Subscribe".id_user = _logined_user and "Post".id_user = "Subscribe".id_user_subscribe)
-			  left join "User" on ("User".id = "Post".id_user)
-			  left join "Like" on ("Like".id_post = "Post".id)
-			  left join "Comment" on ("Comment".id_post = "Post".id)
-			  GROUP BY "Post".id, "Like".id_user, "Comment".id_user, "User".id
+			  join "Subscribe" on ("Subscribe".id_user = _logined_user and "Post".id_user = "Subscribe".id_user_subscribe)
+			  join "User" on ("User".id = "Post".id_user)
+			  GROUP BY "Post".id, "User".id
 			  order by "Post".date desc;
 end;
 $$;
@@ -491,16 +490,15 @@ CREATE FUNCTION public.like_exist(_id_post integer, _logined_user integer) RETUR
     LANGUAGE plpgsql
     AS $$
 declare
-res boolean;
-BEGIN
-	select CASE 
-            	WHEN "Like".id_user = _logined_user
-               		THEN true
-               		ELSE false 
-       			END as my_like 
-       		from "Like" into res where id_post=_id_post;
+count_row integer;
+begin
+	select count(*) from "Like" into count_row where id_post = _id_post and id_user = _logined_user;
 
-	return res;
+	if(count_row = 0) then
+		return false;
+	else
+		return true;
+	end if;
 end;
 $$;
 
@@ -876,9 +874,6 @@ ALTER TABLE ONLY public."Vote" ALTER COLUMN id SET DEFAULT nextval('public."Vote
 --
 
 COPY public."Comment" (id, id_user, id_post, content, date) FROM stdin;
-3	16	34	Короче это крутой пост	2019-01-02 22:15:29.035501+00
-4	16	34	Проверка	2019-01-02 22:15:40.604837+00
-5	18	34	Фига чё ты написал Дениска	2019-01-03 13:26:21.235445+00
 \.
 
 
@@ -887,9 +882,6 @@ COPY public."Comment" (id, id_user, id_post, content, date) FROM stdin;
 --
 
 COPY public."Like" (id, id_user, id_post) FROM stdin;
-59	16	34
-61	16	38
-82	21	40
 \.
 
 
@@ -906,12 +898,7 @@ COPY public."Poll" (id, id_post, body) FROM stdin;
 --
 
 COPY public."Post" (id, id_user, content, date) FROM stdin;
-33	17	Пост Савелия	2019-01-02 19:29:08.61344
-34	16	Пост Дениса	2019-01-02 19:29:42.403691
-35	18	fds	2019-01-02 21:24:32.24742
-36	18	авы	2019-01-02 21:36:31.832844
-37	18	Проверка	2019-01-03 10:48:33.881464
-38	19	Первый пост	2019-01-03 13:59:33.462765
+1	1	Мой первый пост	2019-01-09 18:18:09.58766
 \.
 
 
@@ -920,17 +907,7 @@ COPY public."Post" (id, id_user, content, date) FROM stdin;
 --
 
 COPY public."Subscribe" (id, id_user, id_user_subscribe) FROM stdin;
-44	16	17
-45	18	17
-46	16	16
-47	17	17
-48	18	18
-49	18	16
-51	21	21
-52	22	22
-53	23	23
-54	24	24
-55	25	25
+1	1	1
 \.
 
 
@@ -939,14 +916,7 @@ COPY public."Subscribe" (id, id_user, id_user_subscribe) FROM stdin;
 --
 
 COPY public."User" (id, name, surname, username, password, email, avatar_src) FROM stdin;
-16	Денис	Цветков	Cvetkoff	$2a$08$RzKa/f7iu9yr8TlW2mv4gOpH8a3weTMjv0rgB/8rdwO6ycOQ/FMue	denis.tsvetkov59@gmail.com	img/users/_Cvetkoff.jpg
-17	Савелий	Вепрев	nakazan	$2a$08$crJCln4o1LHeB1VBCNaFpuuFN2l9DJzrqQOw92sWDzVO5Y1fhaXU6	nakazan@gmail.com	img/users/_nakazan.jpg
-18	Артем	Русских	artem	$2a$08$vNoM7i5SOaz0LfoG.W8u7.Dor6ikiZMlrgHh1jesAYUBlwJJQt4gG	russkikh@gmail.com	img/users/default.png
-21	Рома	Двинянинов	roma	$2a$08$3UdfwYtrBE2oHl8ua11Ng.QR5OhKylBCAbZj0uEFrTHi3vcgj19UW	roma@mail.ru	img/users/default.png
-22	Максим	Хохряков	max	$2a$08$kuFJz1YLbXs.oQrt8zsCrOV7l6NzcgMIFwIV8aeM/klz.8s6I2deG	max@gmail.ru	img/users/default.png
-23	Егор	Ломакин	knyaz	$2a$08$zTewM0yF8VDPNSZoFqlw2uN4oE4T6cKhEWfS4EOw1C5uMbVlrITB6	egor@gmail.com	img/users/default.png
-24	Алексей	Бурмантов	leha	$2a$08$2NtVvhVnnH75Uhshmy/bjOTKzs2mOIgNq0o6uGQTdfj5Nk58Tamdu	leha@mail.ru	img/users/default.png
-25	Илья	Оконешников	ilya	$2a$08$lvMvWRtseNvgl0QlLhVV6OmzhuRcYlbbSYHmGc0eTEuQcNdeLvE7a	ilya@mail.ru	img/users/default.png
+1	Денис	Цветков	Cvetkoff	$2a$08$JHstViuA.hof10MuUd9nruWyGNLHtvXEYenQQKolDgRUnaq6HVoGi	denis.tsvetkov59@gmail.com	img/users/_Cvetkoff.jpg
 \.
 
 
@@ -962,14 +932,14 @@ COPY public."Vote" (id, id_poll, id_user, answer) FROM stdin;
 -- Name: Comment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Comment_id_seq"', 5, true);
+SELECT pg_catalog.setval('public."Comment_id_seq"', 1, false);
 
 
 --
 -- Name: Like_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Like_id_seq"', 82, true);
+SELECT pg_catalog.setval('public."Like_id_seq"', 1, false);
 
 
 --
@@ -983,21 +953,21 @@ SELECT pg_catalog.setval('public."Poll_id_seq"', 1, false);
 -- Name: Post_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Post_id_seq"', 40, true);
+SELECT pg_catalog.setval('public."Post_id_seq"', 1, true);
 
 
 --
 -- Name: Subscribe_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Subscribe_id_seq"', 57, true);
+SELECT pg_catalog.setval('public."Subscribe_id_seq"', 1, true);
 
 
 --
 -- Name: User_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."User_id_seq"', 25, true);
+SELECT pg_catalog.setval('public."User_id_seq"', 1, true);
 
 
 --
