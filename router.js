@@ -52,6 +52,8 @@ module.exports = (app, passport)=>{
 
     app.post('/like', posts.like);
 
+    app.post('/vote', posts.vote);
+
     // app.post('/signup', passport.authenticate('local-signup', {
     //     successRedirect: '/profile',
     //     failureRedirect: '/signin',

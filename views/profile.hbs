@@ -33,6 +33,42 @@
                         <p class="post-content">
                             {{this.content}}
                         </p>
+                        {{#if this.poll_body}}
+                        <div class="post-poll" data-poll-id="{{this.poll_id}}">
+                            <ul class="post-poll-option">
+                                {{#each this.poll_body}}
+                                    {{#ifCond ../this.my_vote null}}
+                                    <li>
+                                        <div class="row align-items-center">
+                                            <div class="col-3">
+                                                <div class="title">{{this}}</div>
+                                            </div>
+                                            <div class="col-9">
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-secondary poll-option-answer" data-answer="{{@index}}" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Проголосовать</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {{else}}
+                                    <li>
+                                        <div class="row align-items-center">
+                                            <div class="col-3">
+                                                <div class="title">{{this}} {{#ifCond ../this.my_vote @index}} (ваш выбор){{else}} {{/ifCond}}</div>
+                                            </div>
+                                            <div class="col-9">
+                                                <div class="progress">
+                                                    <div class="progress-bar {{#ifCond ../this.my_vote @index}}bg-primary{{else}}bg-secondary{{/ifCond}}" role="progressbar" style="width: {{procent ../votes @index}}%" aria-valuenow="{{procent ../votes @index}}" aria-valuemin="0" aria-valuemax="100">{{procent ../votes @index}}% (проголосовало {{count_votes ../votes @index}})</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {{/ifCond}}
+                                    
+                                {{/each}}
+                            </ul>
+                        </div>
+                        {{/if}}
                         <div class="post-action-list">
                             <a class="post-comments"><i class="fas fa-comments {{#if this.my_comment}}comment-exist{{/if}}"></i><span class="post-action-list-value">{{this.comments}}</span></a>
                             <a class="post-likes"><i class="fas fa-heart {{#if this.my_like}}liked{{/if}}"></i><span class="post-action-list-value">{{this.likes}}</span></a>
@@ -50,3 +86,4 @@
 </main>
 <script src="js/like.js"></script>
 <script src="js/post-info.js"></script>
+<script src="js/vote.js"></script>

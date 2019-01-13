@@ -289,5 +289,28 @@ header{
             margin-left: 10px;
         }
     }
-    
+}
+
+.post-poll{
+    margin: 0 0 40px;
+    background: rgba(0,0,0,.08);
+    padding: 10px;
+    border-radius: 5px;
+    color:$darkGray;
+    &-option{
+        margin: 0;
+        list-style:none;
+        & > li{
+            margin-top:7px;
+            & .title{
+                font-size: 16px;
+                font-weight: 700;
+            }
+            & .progress{
+                height: 25px; 
+                border: 1px solid $lightGray;
+                text-align: center;
+            }
+        }
+    }
 }

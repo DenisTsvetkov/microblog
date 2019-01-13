@@ -211,3 +211,22 @@ header {
     width: 100px; }
   .poll-option-remove {
     margin-left: 10px; }
+
+.post-poll {
+  margin: 0 0 40px;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 10px;
+  border-radius: 5px;
+  color: #3C3C3C; }
+  .post-poll-option {
+    margin: 0;
+    list-style: none; }
+    .post-poll-option > li {
+      margin-top: 7px; }
+      .post-poll-option > li .title {
+        font-size: 16px;
+        font-weight: 700; }
+      .post-poll-option > li .progress {
+        height: 25px;
+        border: 1px solid #B7B7B7;
+        text-align: center; }

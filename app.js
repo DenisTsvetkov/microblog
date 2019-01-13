@@ -16,7 +16,23 @@ app.engine("hbs", expressHbs(
     {
         layoutsDir: "views/layouts", 
         defaultLayout: "layout",
-        extname: "hbs"
+        extname: "hbs",
+        helpers: {
+            procent: function(array, index){
+                const reducer = (accumulator, currentValue) => accumulator + currentValue;
+                var sum = array.reduce(reducer);
+                return ((array[index]*100)/sum).toFixed(2);
+            },
+            ifCond: function(v1, v2, options) {
+                if(v1 == v2) {
+                  return options.fn(this);
+                }
+                return options.inverse(this);
+            },
+            count_votes: function(array, index){
+                return array[index];
+            }
+        }
     }
 ))
 app.set("view engine", "hbs");
