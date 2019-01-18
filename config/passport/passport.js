@@ -5,9 +5,9 @@ const db = require('../Db').db;
 var LocalStrategy   = require('passport-local').Strategy;
 
 module.exports = function(passport){
-    //console.log(passport)
+    
     passport.serializeUser(function(user, done) {
-        //console.log('User Serialize', user);
+        
         done(null, {
             id: user["id"],
             username: user["username"],
@@ -19,7 +19,7 @@ module.exports = function(passport){
 
     // used to deserialize the user
     passport.deserializeUser(function(id, done) {
-        //console.log('DESERIALIZE', id);
+        
         db.func('get_user_profile_by_id', id.id).then(function(user) {
             if(user){
                 done(null, user[0]);
@@ -38,25 +38,18 @@ module.exports = function(passport){
         },
 
         function(req, username, password, done){
-            //console.log("FFFFFFFFSFDSFSD1", req);
-            //console.log("FFFFFFFFSFDSFSD", username);
-            //console.log("FFFFFFFFSFDSFSD", password);
-            //console.log("FFFFFFFFSFDSFSD", req.body);
             var generateHash = function(password) {
                 return bCrypt.hashSync(password, bCrypt.genSaltSync(8), null);
             };
 
             db.func('get_user_profile', username)
             .then(data=>{
-                //console.log('ЮЗЕР', data[0]);
                 if(data[0])
                 {
-                    console.log('ОШИБКА')
                     return done(null, false, {message : 'That email is already taken'} );
                 }
                 else
                 {
-                    console.log('АХАА', req.body);
                     var userPassword = generateHash(password);
                     var data =[
                         req.body.firstname,
@@ -65,11 +58,8 @@ module.exports = function(passport){
                         userPassword,
                         req.body.email
                     ];
-                    //console.log('ДАТА', data);
                     db.func('create_user', data)
                     .then(function(newUser,created){
-                        console.log('НЬЮ ЮЗЕР', newUser);
-                        console.log('CREATED', created);
                         if(!newUser[0]){
                             return done(null,false);
                         }
@@ -93,31 +83,28 @@ module.exports = function(passport){
         },
 
         function(req, username, password, done) {
-        //console.log('ЮЗЯ нейм', username);
-        var isValidPassword = function(userpass,password){
-            return bCrypt.compareSync(password, userpass);
-        }
+            var isValidPassword = function(userpass,password){
+                return bCrypt.compareSync(password, userpass);
+            }
 
-        db.func('get_user_profile', username).then(function (user) {
-            //console.log('GeT USET PROFILE', user);
-        if (!user[0]) {
-            console.log('User does not exist')
-            return done(null, false, { message: 'User does not exist' });
-        }
+            db.func('get_user_profile', username).then(function (user) {
+            if (!user[0]) {
+                console.log('User does not exist')
+                return done(null, false, { message: 'User does not exist' });
+            }
 
-        if (!isValidPassword(user[0].password,password)) {
-            console.log('Incorrect password.')
-            return done(null, false, { message: 'Incorrect password.' });
-        }
+            if (!isValidPassword(user[0].password,password)) {
+                console.log('Incorrect password.')
+                return done(null, false, { message: 'Incorrect password.' });
+            }
 
-        var userinfo = user[0];
+            var userinfo = user[0];
 
-        return done(null,userinfo);
+            return done(null,userinfo);
 
-        }).catch(function(err){
-            //console.log("Error:",err);
-            return done(null, false, { message: 'Something went wrong with your Signin' });
-        });
+            }).catch(function(err){
+                return done(null, false, { message: 'Something went wrong with your Signin' });
+                });
     }
     ));
 

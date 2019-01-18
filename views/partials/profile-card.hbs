@@ -1,0 +1,25 @@
+<div class="dashboard">
+    <div class="profile-card">
+        <div class="profile-card-info d-flex justify-content-center flex-column align-items-center">
+            <div class="profile-card-avatar-mini">
+                <img src="{{loginedUser.avatar_src}}" alt="Rick Grimes">
+            </div>
+            <span class="profile-card-name">{{loginedUser.firstname}} {{loginedUser.surname}}</span>
+            <a href="/{{loginedUser.username}}" class="profile-card-username">@{{loginedUser.username}}</a>
+        </div>
+        <ul class="profile-stats list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
+                <a href="/{{loginedUser.username}}">Записи</a>
+                <span class="badge badge-primary badge-pill">{{loginedUserStats.posts}}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center borderless" id="subscriptions">
+                <a href="/subscriptions">Подписки</a>
+                <span class="badge badge-primary badge-pill">{{loginedUserStats.subscribtion}}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
+                <a href="/subscribers">Подписчики</a>
+                <span class="badge badge-primary badge-pill">{{loginedUserStats.subscribes}}</span>
+            </li>
+        </ul>
+    </div>
+</div>

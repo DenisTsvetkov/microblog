@@ -16,6 +16,36 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: all_subscribers(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.all_subscribers(_logined_user integer) RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, email character varying, avatar_src text, my_subscribe boolean)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+ RETURN QUERY SELECT "User".id, "User".name, "User".surname, "User".username, "User".email, "User".avatar_src, is_subscribe(_logined_user, "User".username) FROM "User"
+			 join "Subscribe" on ("Subscribe".id_user_subscribe = _logined_user and ("User".id = "Subscribe".id_user and "Subscribe".id_user != _logined_user));
+END; $$;
+
+
+ALTER FUNCTION public.all_subscribers(_logined_user integer) OWNER TO postgres;
+
+--
+-- Name: all_subscriptions(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.all_subscriptions(_logined_user integer) RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, email character varying, avatar_src text)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+ RETURN QUERY SELECT "User".id, "User".name, "User".surname, "User".username, "User".email, "User".avatar_src FROM "User"
+			 join "Subscribe" on ("Subscribe".id_user = _logined_user and ("User".id = "Subscribe".id_user_subscribe and "Subscribe".id_user_subscribe != _logined_user));
+END; $$;
+
+
+ALTER FUNCTION public.all_subscriptions(_logined_user integer) OWNER TO postgres;
+
+--
 -- Name: all_users(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -28,6 +58,82 @@ END; $$;
 
 
 ALTER FUNCTION public.all_users() OWNER TO postgres;
+
+--
+-- Name: all_users(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.all_users(_logined_user integer) RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, email character varying, avatar_src text, my_subscribe boolean)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+ RETURN QUERY SELECT "User".id, "User".name, "User".surname, "User".username, "User".email, "User".avatar_src, is_subscribe(_logined_user, "User".username) FROM "User";
+END; $$;
+
+
+ALTER FUNCTION public.all_users(_logined_user integer) OWNER TO postgres;
+
+--
+-- Name: change_password(integer, character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.change_password(_logined_user integer, _new_password character varying) RETURNS TABLE(id integer, firstname character varying, surname character varying, username character varying, email character varying, avatar_src text)
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+	return query UPDATE "User"
+					SET password = _new_password
+					WHERE
+					 "User".id = _logined_user 
+					RETURNING "User".id, "User".name, "User".surname, "User".username, "User".email, "User".avatar_src;
+end;
+
+$$;
+
+
+ALTER FUNCTION public.change_password(_logined_user integer, _new_password character varying) OWNER TO postgres;
+
+--
+-- Name: change_user(integer, character varying, character varying, character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.change_user(_logined_user integer, _new_firstname character varying, _new_surname character varying, _new_email character varying) RETURNS TABLE(id integer, firstname character varying, surname character varying, username character varying, email character varying, avatar_src text)
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+	return query UPDATE "User"
+					SET name=_new_firstname, surname = _new_surname, email = _new_email
+					WHERE
+					 "User".id = _logined_user 
+					RETURNING "User".id, "User".name, "User".surname, "User".username, "User".email, "User".avatar_src;
+end;
+
+$$;
+
+
+ALTER FUNCTION public.change_user(_logined_user integer, _new_firstname character varying, _new_surname character varying, _new_email character varying) OWNER TO postgres;
+
+--
+-- Name: comment(integer, integer, text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.comment(_logined_user integer, _id_post integer, _content text) RETURNS TABLE(id integer, id_user integer, id_post integer, content text, date text)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+BEGIN
+
+	return query INSERT INTO "Comment" (id_user, id_post, content)
+	VALUES 
+	(_logined_user, _id_post, _content)
+	returning "Comment".id, "Comment".id_user, "Comment".id_post, "Comment".content, "Comment".date;
+END;
+$$;
+
+
+ALTER FUNCTION public.comment(_logined_user integer, _id_post integer, _content text) OWNER TO postgres;
 
 --
 -- Name: comment_exist(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
@@ -161,30 +267,26 @@ $$;
 ALTER FUNCTION public.count_votes(_id_poll integer, _poll_body json) OWNER TO postgres;
 
 --
--- Name: create_poll(integer, json); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: create_poll(integer, json, character varying); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.create_poll(_post_id integer, _poll_body json) RETURNS integer
+CREATE FUNCTION public.create_poll(_post_id integer, _poll_body json, _title character varying) RETURNS integer
     LANGUAGE plpgsql
     AS $$
 
 DECLARE
 _poll_id INTEGER;
 BEGIN
-	IF _poll_body IS NULL THEN
-		RAISE 'Post content is null or empty';
-	END IF;
-	
-	INSERT INTO "Poll" (id_post, body) VALUES (_post_id, _poll_body) RETURNING "Poll".id INTO _poll_id;
+
+	INSERT INTO "Poll" (id_post, body, title) VALUES (_post_id, _poll_body, _title) RETURNING "Poll".id INTO _poll_id;
 	RETURN _poll_id;
-EXCEPTION
-	WHEN foreign_key_violation THEN RAISE 'poll not exist';
+
 END
 
 $$;
 
 
-ALTER FUNCTION public.create_poll(_post_id integer, _poll_body json) OWNER TO postgres;
+ALTER FUNCTION public.create_poll(_post_id integer, _poll_body json, _title character varying) OWNER TO postgres;
 
 --
 -- Name: create_post(integer, text); Type: FUNCTION; Schema: public; Owner: postgres
@@ -203,8 +305,7 @@ BEGIN
 	
 	INSERT INTO "Post" (id_user, content) VALUES (_user_id, _post_text) RETURNING "Post".id INTO _post_id;
 	RETURN _post_id;
-EXCEPTION
-	WHEN foreign_key_violation THEN RAISE 'topic not exist';
+
 END
 
 $$;
@@ -257,9 +358,15 @@ ALTER FUNCTION public.create_user(_name character varying, _surname character va
 CREATE FUNCTION public.delete_post(_post_id integer) RETURNS void
     LANGUAGE plpgsql
     AS $$
-
+declare
+_id_poll integer;
 BEGIN
-	DELETE from "Post" WHERE id = _post_id;
+	DELETE from "Post" WHERE id = _post_id;
+	delete from "Like" where id_post = _post_id;
+	delete from "Comment" where id_post = _post_id;
+	select id from "Poll" into _id_poll where id_post = _post_id;
+	delete from "Vote" where id_poll = _id_poll;
+	delete from "Poll" where id_post = _post_id;
 END
 
 $$;
@@ -271,7 +378,7 @@ ALTER FUNCTION public.delete_post(_post_id integer) OWNER TO postgres;
 -- Name: get_all_posts(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_all_posts(_logined_user integer) RETURNS TABLE(id integer, id_user integer, firstname character varying, surname character varying, username character varying, avatar_user text, content text, date timestamp without time zone, likes integer, comments integer, my_like boolean, my_comment boolean, poll_id integer, poll_body json, my_vote integer, votes integer[])
+CREATE FUNCTION public.get_all_posts(_logined_user integer) RETURNS TABLE(id integer, id_user integer, firstname character varying, surname character varying, username character varying, avatar_user text, content text, date text, likes integer, comments integer, my_like boolean, my_comment boolean, poll_id integer, poll_body json, poll_title character varying, my_vote integer, votes integer[])
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -289,6 +396,7 @@ BEGIN
  					 comment_exist("Post".id, _logined_user),
  					 "Poll".id,
  					 "Poll".body,
+ 					 "Poll".title,
  					 vote_exist("Poll".id, _logined_user),
  					 count_votes("Poll".id, "Poll".body)
 			  FROM "Post"
@@ -307,7 +415,7 @@ ALTER FUNCTION public.get_all_posts(_logined_user integer) OWNER TO postgres;
 -- Name: get_all_user_posts(character varying, integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_all_user_posts(_current_user character varying, _logined_user integer) RETURNS TABLE(id integer, content text, date timestamp without time zone, likes integer, comments integer, my_like boolean, my_comment boolean, poll_id integer, poll_body json, my_vote integer, votes integer[])
+CREATE FUNCTION public.get_all_user_posts(_current_user character varying, _logined_user integer) RETURNS TABLE(id integer, content text, date text, likes integer, comments integer, my_like boolean, my_comment boolean, poll_id integer, poll_body json, poll_title character varying, my_vote integer, votes integer[])
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -320,6 +428,7 @@ BEGIN
  					 comment_exist("Post".id, _logined_user),
  					 "Poll".id,
  					 "Poll".body,
+ 					 "Poll".title,
  					 vote_exist("Poll".id, _logined_user),
  					 count_votes("Poll".id, "Poll".body)
 			  FROM "Post"
@@ -372,14 +481,15 @@ ALTER FUNCTION public.get_count_likes_post(_id_post integer) OWNER TO postgres;
 -- Name: get_post_comments(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_post_comments(_post_id integer) RETURNS TABLE(id_comment integer, content text, date timestamp with time zone, id_user integer, firstname character varying, surname character varying, username character varying, email character varying, avatar_src text)
+CREATE FUNCTION public.get_post_comments(_post_id integer) RETURNS TABLE(id_post integer, id_comment integer, content text, date text, id_user integer, firstname character varying, surname character varying, username character varying, email character varying, avatar_src text)
     LANGUAGE plpgsql
     AS $$
 BEGIN
- RETURN QUERY SELECT "Comment".id, "Comment".content, "Comment".date, "Comment".id_user, "User".name, "User".surname, "User".username, "User".email, "User".avatar_src 
+ RETURN QUERY SELECT "Comment".id_post, "Comment".id, "Comment".content, "Comment".date, "Comment".id_user, "User".name, "User".surname, "User".username, "User".email, "User".avatar_src 
  from "Comment" 
  left join "User" on ("Comment".id_user = "User".id)
- where "Comment".id_post = _post_id;
+ where "Comment".id_post = _post_id
+ order by "Comment".date desc;
 END; $$;
 
 
@@ -425,7 +535,7 @@ ALTER FUNCTION public.get_user_profile(_username character varying) OWNER TO pos
 -- Name: get_user_profile_by_id(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_user_profile_by_id(_id integer) RETURNS TABLE(id integer, name character varying, surname character varying, username character varying, email character varying, password character varying, avatar_src text)
+CREATE FUNCTION public.get_user_profile_by_id(_id integer) RETURNS TABLE(id integer, firstname character varying, surname character varying, username character varying, email character varying, password character varying, avatar_src text)
     LANGUAGE plpgsql
     AS $$ 
 BEGIN 
@@ -453,6 +563,25 @@ $$;
 ALTER FUNCTION public.get_user_stats(_username character varying) OWNER TO postgres;
 
 --
+-- Name: is_subscribe(integer, character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.is_subscribe(_logined_user integer, _username character varying) RETURNS boolean
+    LANGUAGE plpgsql
+    AS $$
+declare
+res boolean;
+begin
+	SELECT EXISTS (SELECT id_user, id_user_subscribe from "Subscribe" where id_user = _logined_user and id_user_subscribe = get_user_id(_username)) into res;
+	return res;
+end;
+
+$$;
+
+
+ALTER FUNCTION public.is_subscribe(_logined_user integer, _username character varying) OWNER TO postgres;
+
+--
 -- Name: is_subscribe(character varying, character varying); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -475,7 +604,7 @@ ALTER FUNCTION public.is_subscribe(_current_username character varying, _usernam
 -- Name: like(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public."like"(_current_user integer, _post_like integer) RETURNS TABLE(id integer, id_user integer, id_user_subscribe integer)
+CREATE FUNCTION public."like"(_current_user integer, _post_like integer) RETURNS TABLE(id integer, id_user integer, id_post integer)
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -541,6 +670,23 @@ $$;
 
 
 ALTER FUNCTION public.subscribe(_current_user integer, _user_subscribe integer) OWNER TO postgres;
+
+--
+-- Name: uncomment(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.uncomment(_logined_user integer, _id_comment integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+	DELETE from "Comment" WHERE id_user = _logined_user and id = _id_comment;
+end;
+
+$$;
+
+
+ALTER FUNCTION public.uncomment(_logined_user integer, _id_comment integer) OWNER TO postgres;
 
 --
 -- Name: unlike(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
@@ -631,7 +777,7 @@ CREATE TABLE public."Comment" (
     id_user integer,
     id_post integer,
     content text,
-    date timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+    date text DEFAULT to_char((CURRENT_TIMESTAMP + ((5 || ' hours'::text))::interval), 'HH24:MI DD.MM.YYYY'::text)
 );
 
 
@@ -701,7 +847,8 @@ ALTER SEQUENCE public."Like_id_seq" OWNED BY public."Like".id;
 CREATE TABLE public."Poll" (
     id integer NOT NULL,
     id_post integer,
-    body json
+    body json,
+    title character varying
 );
 
 
@@ -737,7 +884,7 @@ CREATE TABLE public."Post" (
     id integer NOT NULL,
     id_user integer,
     content text,
-    date timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    date text DEFAULT to_char((CURRENT_TIMESTAMP + ((5 || ' hours'::text))::interval), 'HH24:MI DD.MM.YYYY'::text)
 );
 
 
@@ -944,12 +1091,7 @@ COPY public."Like" (id, id_user, id_post) FROM stdin;
 -- Data for Name: Poll; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."Poll" (id, id_post, body) FROM stdin;
-1	30	["PHP","JavaScript"]
-2	31	["Рисование","Музыка","Спорт"]
-3	32	["Рикардо","Милос","Рикардо Милос"]
-5	38	["1","2"]
-6	39	["1"]
+COPY public."Poll" (id, id_post, body, title) FROM stdin;
 \.
 
 
@@ -958,26 +1100,6 @@ COPY public."Poll" (id, id_post, body) FROM stdin;
 --
 
 COPY public."Post" (id, id_user, content, date) FROM stdin;
-20	1	должно работать	2019-01-13 14:04:59.526277
-21	1	Голосование, славяне	2019-01-13 14:06:42.030111
-22	1	ухух	2019-01-13 14:08:38.086062
-23	1	Работает, славяне	2019-01-13 14:11:09.78668
-24	1	Контрольная проверка, славяне	2019-01-13 14:12:35.183443
-25	1	тест	2019-01-13 14:55:18.904385
-26	1	тест2	2019-01-13 14:56:04.969836
-27	1	тест3	2019-01-13 14:57:13.996845
-28	1	Тест, славяне	2019-01-13 15:02:46.666795
-29	1	тест 2, славяне	2019-01-13 15:04:04.884872
-30	1	Тест 3, славяне	2019-01-13 15:04:41.55737
-31	1	Проверка	2019-01-13 18:45:45.09843
-32	1	Кто самый крутой?	2019-01-13 20:30:42.505526
-33	4	Чек	2019-01-13 21:23:16.105074
-34	4	чек2	2019-01-13 21:24:15.767356
-35	4	чек2	2019-01-13 21:26:15.806304
-36	2	чек	2019-01-13 21:28:36.243728
-37	2	чек2	2019-01-13 21:28:49.932294
-38	2	чек2	2019-01-13 21:29:12.645104
-39	2	чекк	2019-01-13 21:31:11.975602
 \.
 
 
@@ -986,11 +1108,6 @@ COPY public."Post" (id, id_user, content, date) FROM stdin;
 --
 
 COPY public."Subscribe" (id, id_user, id_user_subscribe) FROM stdin;
-1	1	1
-2	2	2
-3	3	3
-4	4	4
-5	4	1
 \.
 
 
@@ -999,10 +1116,6 @@ COPY public."Subscribe" (id, id_user, id_user_subscribe) FROM stdin;
 --
 
 COPY public."User" (id, name, surname, username, password, email, avatar_src) FROM stdin;
-1	Денис	Цветков	Cvetkoff	$2a$08$JHstViuA.hof10MuUd9nruWyGNLHtvXEYenQQKolDgRUnaq6HVoGi	denis.tsvetkov59@gmail.com	img/users/_Cvetkoff.jpg
-2	Савелий	Вепрев	nakazan	$2a$08$LsFtexSSDoGXjBtom/d2m.AMWgSuaFEMq1xNqwRrhX5K6cV1iikAO	nakazan@gmail.com	img/users/default.png
-3	Светлана	Цветкова	svetlana	$2a$08$tJOwdv44S8x0LZQqXl9DT.g5Hs28YGZbaUw8IrTHL3pKjXrBhoucO	sv-cv@mail.ru	img/users/default.png
-4	Максим	Хохряков	max	$2a$08$e2sGNKFBcaWXBhRelioBp.a1tnD3cJYkIW523nyBERWZj1NUbTglq	max@gmail.com	img/users/default.png
 \.
 
 
@@ -1011,17 +1124,6 @@ COPY public."User" (id, name, surname, username, password, email, avatar_src) FR
 --
 
 COPY public."Vote" (id, id_poll, id_user, answer) FROM stdin;
-1	1	1	1
-2	2	1	1
-3	2	2	0
-4	1	2	0
-5	3	1	2
-6	3	3	0
-7	3	2	1
-8	2	4	1
-9	3	4	2
-10	6	2	0
-11	6	1	0
 \.
 
 
@@ -1036,42 +1138,42 @@ SELECT pg_catalog.setval('public."Comment_id_seq"', 1, false);
 -- Name: Like_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Like_id_seq"', 2, true);
+SELECT pg_catalog.setval('public."Like_id_seq"', 1, false);
 
 
 --
 -- Name: Poll_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Poll_id_seq"', 6, true);
+SELECT pg_catalog.setval('public."Poll_id_seq"', 1, false);
 
 
 --
 -- Name: Post_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Post_id_seq"', 39, true);
+SELECT pg_catalog.setval('public."Post_id_seq"', 1, false);
 
 
 --
 -- Name: Subscribe_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Subscribe_id_seq"', 5, true);
+SELECT pg_catalog.setval('public."Subscribe_id_seq"', 1, false);
 
 
 --
 -- Name: User_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."User_id_seq"', 4, true);
+SELECT pg_catalog.setval('public."User_id_seq"', 1, false);
 
 
 --
 -- Name: Vote_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Vote_id_seq"', 11, true);
+SELECT pg_catalog.setval('public."Vote_id_seq"', 1, false);
 
 
 --

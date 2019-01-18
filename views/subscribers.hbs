@@ -5,9 +5,9 @@
                 {{>profile-card}}
             </div>
             <div class="col-12 col-lg-9">
+                <h5>Ваши подписчики</h5>
                 <ul class="users">
                     {{#each users}}
-                        {{#not_equals this.id ../loginedUser.id}}
                         <li data-id="{{this.id}}">
                             <a href="/{{this.username}}">
                                 <img src="{{this.avatar_src}}" alt="{{this.name}} {{this.surname}}">
@@ -19,10 +19,13 @@
                             {{#if my_subscribe}}
                                 <a class="btn btn-secondary btn-sm text-light subscribe-btn" id="subscribe-btn" data-action="unsubscribe">Отписаться</a>
                                 {{else}}
-                                <a class="btn btn-primary btn-sm text-light subscribe-btn" id="subscribe-btn" data-action="subscribe">Подписаться</a>
+                                <a class="btn btn-primary btn-sm text-light subscribe-btn" id="subscribe-btn" data-action="subscribe">Подписаться в ответ</a>
                             {{/if}}
                         </li>
-                        {{/not_equals}}
+                        {{else}}
+                        <div class="posts-not-found">
+                            <p>У вас нет подписчиков</p>
+                        </div>
                     {{/each}}
                 </div>
             </div>

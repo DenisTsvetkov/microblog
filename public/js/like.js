@@ -13,7 +13,6 @@ $.getScript('js/ajax.js', function(){
                 'post_id':thisPost.parents('.post').data('id')
             }, function(res){
                 if(res.like){
-                    console.log(thisPost);
                     thisPost.children('i.fa-heart').addClass('liked');
                     thisPost.children('.post-action-list-value').text(countLikes+1);
                     if($('.dashboard').children('button.btn').text() == "Изменить профиль"){

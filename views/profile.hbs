@@ -35,6 +35,7 @@
                         </p>
                         {{#if this.poll_body}}
                         <div class="post-poll" data-poll-id="{{this.poll_id}}">
+                            <div class="post-poll-title">{{this.poll_title}}</div>
                             <ul class="post-poll-option">
                                 {{#each this.poll_body}}
                                     {{#ifCond ../this.my_vote null}}
@@ -58,7 +59,7 @@
                                             </div>
                                             <div class="col-9">
                                                 <div class="progress">
-                                                    <div class="progress-bar {{#ifCond ../this.my_vote @index}}bg-primary{{else}}bg-secondary{{/ifCond}}" role="progressbar" style="width: {{procent ../votes @index}}%" aria-valuenow="{{procent ../votes @index}}" aria-valuemin="0" aria-valuemax="100">{{procent ../votes @index}}% (проголосовало {{count_votes ../votes @index}})</div>
+                                                    <div class="progress-bar {{#ifCond ../this.my_vote @index}}bg-blue{{else}}bg-blue-light{{/ifCond}}" role="progressbar" style="width: {{procent ../votes @index}}%" aria-valuenow="{{procent ../votes @index}}" aria-valuemin="0" aria-valuemax="100">{{procent ../votes @index}}% (проголосовало {{count_votes ../votes @index}})</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -84,6 +85,4 @@
         </div>
     </div>
 </main>
-<script src="js/like.js"></script>
-<script src="js/post-info.js"></script>
-<script src="js/vote.js"></script>
+{{> scripts}}

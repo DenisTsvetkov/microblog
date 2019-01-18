@@ -1,0 +1,25 @@
+<div class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-3">
+                {{> dashboard}}
+            </div>
+            <div class="col-12 col-lg-9">
+                <h4>Настройки</h4>
+                <form action="/change_password" method="POST">
+                    <h6>Поменять пароль:</h6>
+                    <div class="form-group">
+                        <label for="inputPassword1">Введите пароль:</label>
+                        <input type="password" class="form-control" id="password1" name="password1" placeholder="Введите новый пароль">
+                        
+                    </div>
+                    <div class="form-group">
+                        <label for="inputPassword2">Повторите пароль</label>
+                        <input type="password" class="form-control" id="password2" name="password2" placeholder="Повторите пароль">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сменить пароль</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

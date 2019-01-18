@@ -8,7 +8,6 @@ const favicon = require('express-favicon');
 
 const app = express();
 
-
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 
 // For Handlebars
@@ -29,9 +28,15 @@ app.engine("hbs", expressHbs(
                 }
                 return options.inverse(this);
             },
+            not_equals: function(v1, v2, options) {
+                if(v1 != v2) {
+                  return options.fn(this);
+                }
+                return options.inverse(this);
+            },
             count_votes: function(array, index){
                 return array[index];
-            }
+            },
         }
     }
 ))

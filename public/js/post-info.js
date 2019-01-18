@@ -1,5 +1,5 @@
 $.getScript('js/ajax.js', function(){
-    $('.post-comments').on('click', function(e){
+    $('.post-action-list > .post-comments').on('click', function(e){
         e.preventDefault();
         
         let thisPost = $(this).parents('.post');
@@ -12,9 +12,6 @@ $.getScript('js/ajax.js', function(){
         AJAX('/post-info', 'POST', {
             'post_id':thisPost.data('id')
         }, function(res){
-            console.log(thisPost);
-            console.log($.trim(thisPostContent));
-            console.log('Аватар', thisPostAuthorAvatar)
             $('#gridSystemModal').find('.post-content').text($.trim(thisPostContent));
             $('#gridSystemModal').find('.post-name').text($.trim(thisPostAuthorName));
             $('#gridSystemModal').find('.post-username').text($.trim(thisPostAuthorUsername));
@@ -22,13 +19,14 @@ $.getScript('js/ajax.js', function(){
 
             $('#gridSystemModal').find('.post-avatar > img').attr('src', thisPostAuthorAvatar).attr('alt', thisPostAuthorName);
 
-            console.log(res.postComments);
-            $('#gridSystemModal .post-comments').children('.comment').empty();
+
+            $('#gridSystemModal #new-comment #id_post').val(thisPost.data('id'));
+            $('#gridSystemModal .post-comments .list-comments').children('.comment').empty();
             
             if(res.postComments.length != 0){
                 $.each(res.postComments, function( index, value ) {
-                    $('.poll .poll-option').append(
-                        `<div class='comment'>
+                    $('#gridSystemModal .post-comments .list-comments').append(
+                        `<div class='comment' data-id='${value.id_comment}'>
                             <div class='comment-avatar'>
                                 <img src='${value.avatar_src}' alt='${value.firstname} ${value.surname}' class='align-bottom'>
                             </div>
@@ -40,6 +38,11 @@ $.getScript('js/ajax.js', function(){
                             </p>
                         </div>`
                     );
+                    if(value.id_user == res.loginedUser){
+                        $('#gridSystemModal .post-comments .list-comments .comment').last().prepend(
+                            `<span class="comment-delete"><i class="fas fa-times"></i></span>`
+                        );
+                    }
                 });
             }
             else{

@@ -25,10 +25,10 @@
                 </div>
             </div>
             <div class="col-12">
-                <form action="/new_comment" method="POST">
+                <form action="/new_comment" method="POST" id="new-comment">
                     <div class="form-group d-flex justify-content-end flex-wrap">
-                        <input type="hidden" name="id_user" value="{{loginedUser.id}}">
-                        <textarea class="form-control" name="post_text" id="post_text" placeholder="Напишите комментарий..." required></textarea>
+                        <input type="hidden" name="id_post" id="id_post">
+                        <textarea class="form-control" name="comment_text" id="comment_text" placeholder="Напишите комментарий..." required></textarea>
                         <button type="submit" class="btn btn-success btn-sm" style="margin: 5px 0"><i class="far fa-edit"></i> Отправить</button>
                     </div>
                 </form>
@@ -36,6 +36,7 @@
             <div class="col-12">
                 <div class="post-comments">
                   <h6>Комментарии пользователей</h6>
+                  <div class="list-comments"></div>
                 </div>
             </div>
           </div>

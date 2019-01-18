@@ -5,30 +5,30 @@
                 <img src="{{data.avatar_src}}" alt="Rick Grimes">
             </div>
             <span class="profile-card-name">{{data.firstname}} {{data.surname}}</span>
-            <a href="#" class="profile-card-username">@{{data.username}}</a>
+            <a href="{{data.username}}" class="profile-card-username">@{{data.username}}</a>
         </div>
         <ul class="profile-stats list-group">
             <li class="list-group-item d-flex justify-content-between align-items-center borderless">
-                Записей
+                Записи
                 <span class="badge badge-primary badge-pill">{{stats.posts}}</span>
             </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
-                <a href="/{{data.username}}/subscribtions/">Подписок</a>
+            <li class="list-group-item d-flex justify-content-between align-items-center borderless" id="subscriptions">
+                {{#if current_profile}}<a href="/subscriptions">Подписки</a>{{else}}Подписки{{/if}}
                 <span class="badge badge-primary badge-pill">{{stats.subscribtion}}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center borderless" id="subscribers">
-                <a href="/{{data.username}}/subscribers/">Подписчиков</a>
+                {{#if current_profile}}<a href="/subscribers">Подписчики</a>{{else}}Подписчики{{/if}}
                 <span class="badge badge-primary badge-pill">{{stats.subscribes}}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center borderless" id="count-liked-posts">
-                <a href="/{{data.username}}/liked_posts/">Понравилось постов</a>
+                Понравилось постов
                 <span class="badge badge-primary badge-pill">{{stats.likes}}</span>
             </li>
         </ul>
         
     </div>
     {{#if current_profile}}
-        <button class="btn btn-success w-100">Изменить профиль</button>
+        <a href="edit" class="btn btn-success w-100">Изменить профиль</a>
         {{else}}
         {{#if subscribe}}
             <a class="btn btn-secondary w-100 font-weight-bold text-light" id="subscribe-btn" data-action="unsubscribe">Отписаться</a>

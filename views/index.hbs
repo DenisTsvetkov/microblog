@@ -3,31 +3,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12 col-lg-3">
-                <div class="dashboard">
-                    <div class="profile-card">
-                        <div class="profile-card-info d-flex justify-content-center flex-column align-items-center">
-                            <div class="profile-card-avatar-mini">
-                                <img src="{{loginedUser.avatar_src}}" alt="Rick Grimes">
-                            </div>
-                            <span class="profile-card-name">{{loginedUser.name}} {{loginedUser.surname}}</span>
-                            <a href="#" class="profile-card-username">@{{loginedUser.username}}</a>
-                        </div>
-                        <ul class="profile-stats list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
-                                Записей
-                                <span class="badge badge-primary badge-pill">{{loginedUserStats.posts}}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
-                                Подписок
-                                <span class="badge badge-primary badge-pill">{{loginedUserStats.subscribtion}}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center borderless">
-                                Подписчиков
-                                <span class="badge badge-primary badge-pill">{{loginedUserStats.subscribes}}</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                {{>profile-card}}
             </div>
             <div class="col-12 col-lg-9">
                 <div class="news">
@@ -44,6 +20,7 @@
                             </p>
                             {{#if this.poll_body}}
                             <div class="post-poll" data-poll-id="{{this.poll_id}}">
+                                <div class="post-poll-title">{{this.poll_title}}</div>
                                 <ul class="post-poll-option">
                                     {{#each this.poll_body}}
                                         {{#ifCond ../this.my_vote null}}
@@ -67,7 +44,7 @@
                                                 </div>
                                                 <div class="col-9">
                                                     <div class="progress">
-                                                        <div class="progress-bar {{#ifCond ../this.my_vote @index}}bg-primary{{else}}bg-secondary{{/ifCond}}" role="progressbar" style="width: {{procent ../votes @index}}%" aria-valuenow="{{procent ../votes @index}}" aria-valuemin="0" aria-valuemax="100">{{procent ../votes @index}}%</div>
+                                                        <div class="progress-bar {{#ifCond ../this.my_vote @index}}bg-blue{{else}}bg-blue-light{{/ifCond}}" role="progressbar" style="width: {{procent ../votes @index}}%" aria-valuenow="{{procent ../votes @index}}" aria-valuemin="0" aria-valuemax="100">{{procent ../votes @index}}%</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -93,6 +70,4 @@
         </div>
     </div>
 </main>
-<script src="js/like.js"></script>
-<script src="js/post-info.js"></script>
-<script src="js/vote.js"></script>
+{{> scripts}}

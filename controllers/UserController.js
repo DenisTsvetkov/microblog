@@ -1,19 +1,18 @@
 const db = require('../config/Db').db;
+var bCrypt = require('bcrypt-nodejs');
 
 async function all(req, res){
-
     const result = {};
 
     result.loginedUser = req['user']
 
-    const users = await db.func('all_users');
+    const users = await db.func('all_users', req['user'].id);
     result.users = users;
 
     const stats = await db.func('get_user_stats', req['user'].username);
     result.loginedUserStats = stats[0];
 
     result.this_css = 'main';
-    console.log('Пользователи', result);
     res.render('people', result);
 }
 
@@ -44,7 +43,6 @@ async function profile(req, res){
     
     userProfile.this_css = 'main';
 
-    console.log(userProfile)
     if(userProfile.data == undefined){
         res.status(404).render('notfound', userProfile);
         exit();
@@ -65,8 +63,6 @@ async function lenta(req, res){
     userProfile.allPosts = allPosts;
 
     userProfile.this_css = 'main';
-
-    console.log(userProfile)
     res.render('index', userProfile);
 }
 
@@ -83,11 +79,54 @@ async function subscribe(req, res){
     }
 }
 
+async function settings(req, res){
+    let data = {};
+    data.data = req['user'];
+    data.current_profile = true;
+    data.this_css = 'main';
+    const stats = await db.func('get_user_stats', req['user'].username);
+    data.stats = stats[0];
+    data.loginedUser = req['user'];
+    res.render('settings', data);
+}
+
+async function changePassword(req, res){
+    var generateHash = function(password) {
+        return bCrypt.hashSync(password, bCrypt.genSaltSync(8), null);
+    };
+    let pass1 = req.body.password1;
+    let pass2 = req.body.password2;
+    if(pass1 == pass2){
+        const user = await db.func('change_password', [req['user'].id, generateHash(pass1)]);
+        res.redirect('/'+req['user'].username);
+    }
+}
+
+async function edit(req, res){
+    let data = {
+        data: req['user'],
+        this_css: 'main'
+    }
+    const stats = await db.func('get_user_stats', req['user'].username);
+    data.stats = stats[0];
+    data.loginedUser = req['user'];
+    data.current_profile = true;
+    res.render('edit', data);
+}
+
+async function changeProfile(req, res){
+    const user = db.func('change_user', [req['user'].id, req.body.firstname, req.body.surname, req.body.email]);
+    res.redirect('/'+req['user'].username);
+}
+
 exports.all = all;
 exports.profile = profile;
 exports.lenta = lenta;
 exports.subscribe = subscribe;
-
+exports.settings = settings;
+exports.changePassword = changePassword;
+exports.edit = edit;
+exports.changeProfile = changeProfile;
 
 
 
