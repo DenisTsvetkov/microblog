@@ -64,12 +64,6 @@ require(__dirname+'/router')(app,passport);
 
 
 
-// For Router
-//var router = express.Router();
-// var indexRouter = require(__dirname+'/router');
-// app.use('/', indexRouter);
-
-
 
 app.listen(3000, function(){
     console.log('Express server listening on port 3000');
