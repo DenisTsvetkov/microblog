@@ -4,7 +4,7 @@ const cn = {
     port: 5432,
     database: 'microblog',
     user: 'postgres',
-    password: 'batman59' //password here
+    password: '' //password here
 };
 
 exports.db = pgp(cn);
